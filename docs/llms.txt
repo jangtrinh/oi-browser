@@ -1,0 +1,16 @@
+# Ổi Browser
+
+> Local-first AI browser and 9 Vietnamese fruit companions with Karpathy-Wiki markdown memory and zero cloud telemetry.
+
+Ổi Browser is a zero-dependency, self-hosted agentic AI browser with 9 3D Vietnamese fruit companions, DOM agent automation, and local SQLite + Markdown memory.
+
+## Key Capabilities
+- 9 Vietnamese Fruit Companions (`Ổi Đào`, `Măng Cụt`, `Sầu Riêng Ri6`, `Thanh Long Đỏ`, `Bưởi Da Xanh`, `Vú Sữa Lò Rèn`, `Xoài Cát Hòa Lộc`, `Chôm Chôm Nhãn`, `Vải Thiều Thanh Hà`) rendered with 3D fruit icons + Lottie animations.
+- Karpathy-Wiki Markdown Memory (`PROFILE.md`, `COMPANION.md`, `observations/*.md`) with Dream Consolidation.
+- Agentic DOM Browser Automation (`[data-oi-id]`) and Visual Artifacts.
+- Native Node.js 22+ (`node:sqlite`, `node:http`) with zero external npm dependencies and zero telemetry.
+
+## Documentation & Links
+- [GitHub Repository](https://github.com/jangtrinh/oi-browser)
+- [Landing Page](https://jangtrinh.github.io/oi-browser/)
+- [License: PolyForm Shield 1.0.0](https://github.com/jangtrinh/oi-browser/blob/main/LICENSE)

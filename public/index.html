@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: file: oi: https: *.ytimg.com http://localhost:* http://127.0.0.1:* crx:; frame-src oi: http://localhost:* http://127.0.0.1:* https://www.youtube.com https://www.youtube-nocookie.com https://customer-rn02o8l4w1fgt0lf.cloudflarestream.com; object-src oi:; media-src 'self' https://oibrowser.vn http://localhost:* http://127.0.0.1:*; connect-src 'self' blob: oi: http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* https://o4509867018158080.ingest.de.sentry.io https://www.gstatic.com https://*.r2.cloudflarestorage.com;"
+    />
+    <title>Ổi Browser</title>
+    <style>@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}}</style>
+    <script src="/fruits/lottie.min.js"></script>
+    <script>
+      {
+        if (location.pathname === '/') {
+          history.replaceState(null, '', '/newtab' + location.search + location.hash)
+        }
+        const initialTheme = new URLSearchParams(location.search).get('theme') ?? localStorage.getItem('berry-theme') ?? 'light'
+        document.documentElement.classList.toggle('dark', initialTheme === 'dark')
+        document.documentElement.style.colorScheme = initialTheme
+      }
+
+      // Onboarding opens on the dark welcome stage. Mark it before anything paints so a slow load
+      // shows black, never the light theme, until the onboarding layout draws its own background.
+      if (location.pathname.startsWith('/onboarding')) {
+        document.documentElement.classList.add('onboarding-boot')
+      }
+
+      // Polyfill crypto.randomUUID for non-secure contexts (app:// protocol)
+      if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
+        crypto.randomUUID = function () {
+          return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+            (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
+          )
+        }
+      }
+    </script>
+		<link href="/_app/immutable/assets/0.aoqKTpgP.css" rel="stylesheet">
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <div id="app">
+			<script>
+				{
+					__sveltekit_psngvm = {
+						base: ""
+					};
+
+					const element = document.currentScript.parentElement;
+
+					import("/berry-electron-bridge.js").then(() =>
+						Promise.all([
+							import("/_app/immutable/entry/start.DpNOqzh1.js"),
+							import("/_app/immutable/entry/app.-qs_HR2H.js")
+						])
+					).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+				}
+			</script>
+		</div>
+  </body>
+</html>
