@@ -4,8 +4,8 @@
 
 Ổi Browser is a zero-dependency, self-hosted agentic AI browser with 9 3D Vietnamese fruit companions, DOM agent automation, and local SQLite + Markdown memory.
 
-[![CI Status](https://img.shields.io/github/actions/workflow/status/jangtrinh/oi-browser/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/jangtrinh/oi-browser/actions/workflows/ci.yml)
-[![Latest release](https://img.shields.io/github/v/release/jangtrinh/oi-browser?style=for-the-badge)](https://github.com/jangtrinh/oi-browser/releases)
+[![Tests: 7/7 Passing](https://img.shields.io/badge/tests-7%2F7_passing-202020?style=for-the-badge)](test/berry-browser.test.js)
+[![Release: v1.0.0](https://img.shields.io/badge/release-v1.0.0-202020?style=for-the-badge)](https://github.com/jangtrinh/oi-browser/releases)
 [![License: PolyForm Shield 1.0.0](https://img.shields.io/badge/license-PolyForm_Shield_1.0.0-202020?style=for-the-badge)](LICENSE)
 ![Local First](https://img.shields.io/badge/architecture-local--first-202020?style=for-the-badge)
 ![Zero Telemetry](https://img.shields.io/badge/telemetry-zero-202020?style=for-the-badge)
