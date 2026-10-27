@@ -1,0 +1,1 @@
+const s="https://docs.oibrowser.vn/knowledge/routines",r="https://docs.oibrowser.vn/knowledge/skills",o="https://docs.oibrowser.vn/billing/teams",t="https://docs.oibrowser.vn/integrations/overview",e="https://docs.oibrowser.vn/browser/import-from-other-browsers",c="https://docs.oibrowser.vn/knowledge/transcription";export{t as I,s as R,r as S,c as T,e as a,o as b};

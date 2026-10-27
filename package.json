@@ -1,0 +1,22 @@
+{
+  "name": "oi-browser",
+  "version": "1.0.0",
+  "description": "Ổi Browser — Local-First Agentic AI Browser & Vietnamese Fruit Companion OS",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jangtrinh/oi-browser.git"
+  },
+  "homepage": "https://jangtrinh.github.io/oi-browser/",
+  "type": "module",
+  "main": "src/server/berry-http-server.js",
+  "scripts": {
+    "dev": "node --experimental-sqlite src/server/berry-http-server.js --port 4104",
+    "start": "node --experimental-sqlite src/server/berry-http-server.js --port 4104",
+    "build:macos": "bash scripts/build-macos-app.sh",
+    "test": "node --experimental-sqlite --test test/berry-browser.test.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}

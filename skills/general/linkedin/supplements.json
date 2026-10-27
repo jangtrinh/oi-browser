@@ -1,0 +1,1 @@
+{"schemaVersion":1,"supplements":[{"path":"references/sales-navigator.md","featureFlag":"linkedinSalesNavigatorEnabled"},{"path":"references/recruiter-lite.md","featureFlag":"linkedinRecruiterLiteEnabled"}]}

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiến trúc &amp; Cơ chế Hoạt động — Ổi Browser 1.0.0</title>
+<meta name="description" content="Bản vẽ kiến trúc 5 tầng và phân tích chuyên sâu 7 phân hệ cốt lõi của Ổi Browser 1.0.0.">
+<link rel="icon" type="image/png" href="assets/guava.png">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="ds-skip-link" href="#main">Chuyển tới nội dung</a>
+<div class="ds-shell">
+  <nav class="ds-shell-nav" aria-label="Primary">
+    <a class="wordmark" href="index.html">ỔI BROWSER</a>
+    <div class="home-nav-links">
+      <a class="ds-tab" href="#layers">5 Tầng Kiến trúc</a>
+      <a class="ds-tab" href="#ipc">IPC Bridge</a>
+      <a class="ds-tab" href="#dom-agent">DOM Agent</a>
+      <a class="ds-tab" href="#memory">Karpathy-Wiki</a>
+      <a class="ds-tab" href="https://github.com/jangtrinh/oi-browser">GitHub</a>
+    </div>
+  </nav>
+
+  <main id="main" class="ds-shell-main">
+    <section aria-labelledby="arch-title">
+      <p class="ds-heading eyebrow" data-level="3">System Architecture · Ổi Browser 1.0.0</p>
+      <h1 id="arch-title" class="ds-heading" data-level="1">Kiến trúc 5 tầng và cơ chế vận hành cục bộ 100% của Ổi Browser.</h1>
+      <p class="lede">Toàn bộ hệ thống gói gọn trong 11 mô-đun nguồn (&lt; 200 dòng/file, tổng 1,673 dòng) nối trực tiếp giao diện SvelteKit 5 vào nhân Node.js 22+ SQLite và bộ nhớ Karpathy-Wiki trên cổng cố định 127.0.0.1:4104.</p>
+
+      <figure class="ds-card branch-page-media">
+        <div class="ds-card-stage" style="padding:24px;background:#FAF8F5">
+          <svg viewBox="0 0 1120 620" width="100%" height="auto" role="img" aria-label="Sơ đồ Kiến trúc 5 Tầng của Ổi Browser 1.0.0" style="font-family:Inter,-apple-system,sans-serif">
+            <rect x="0" y="0" width="1120" height="620" rx="12" fill="#FAF8F5"/>
+            <!-- Layer 1: Shell & Surface -->
+            <rect x="24" y="20" width="1072" height="96" rx="10" fill="#FFFFFF" stroke="#E4DFD7" stroke-width="1.5"/>
+            <text x="44" y="46" font-size="12" font-weight="600" fill="#2E8B57" letter-spacing="0.06em">TẦNG 1 · DESKTOP SHELL &amp; SVELTEKIT 5 RENDERER (public/_app/ + src/macos/)</text>
+            <rect x="44" y="58" width="240" height="44" rx="6" fill="#F3EFEA"/>
+            <text x="58" y="78" font-size="13" font-weight="600" fill="#181512">macOS WKWebView Shell</text>
+            <text x="58" y="94" font-size="11" fill="#575049">berry-desktop-shell.swift (49d)</text>
+            <rect x="300" y="58" width="250" height="44" rx="6" fill="#F3EFEA"/>
+            <text x="314" y="78" font-size="13" font-weight="600" fill="#181512">SvelteKit 5 + Tailwind v4 UI</text>
+            <text x="314" y="94" font-size="11" fill="#575049">/newtab · /chat · /hire · /routines</text>
+            <rect x="566" y="58" width="250" height="44" rx="6" fill="#F3EFEA"/>
+            <text x="580" y="78" font-size="13" font-weight="600" fill="#181512">3D Fruit + Lottie Engine</text>
+            <text x="580" y="94" font-size="11" fill="#575049">berry-fruit-lottie.js (87d)</text>
+            <rect x="832" y="58" width="244" height="44" rx="6" fill="#F3EFEA"/>
+            <text x="846" y="78" font-size="13" font-weight="600" fill="#181512">3D Guava Brand &amp; 9 Trợ lý</text>
+            <text x="846" y="94" font-size="11" fill="#575049">/fruits-3d/*.png + /fruits/*.json</text>
+
+            <!-- Arrow 1 -> 2 -->
+            <path d="M560 116 L560 142" stroke="#2E8B57" stroke-width="2"/>
+            <polygon points="555,138 565,138 560,146" fill="#2E8B57"/>
+
+            <!-- Layer 2: Client IPC Bridge -->
+            <rect x="24" y="146" width="1072" height="104" rx="10" fill="#FFFFFF" stroke="#2E8B57" stroke-width="1.5"/>
+            <text x="44" y="172" font-size="12" font-weight="600" fill="#2E8B57" letter-spacing="0.06em">TẦNG 2 · CLIENT ELECTRON IPC SHIM &amp; TOPIC BUS (src/client/)</text>
+            <rect x="44" y="184" width="330" height="52" rx="6" fill="#EEF7F1"/>
+            <text x="58" y="205" font-size="13" font-weight="600" fill="#181512">window.electronAPI &amp; EventBus</text>
+            <text x="58" y="223" font-size="11" fill="#575049">berry-electron-bridge.js (159d) · subscribeIPCState</text>
+            <rect x="392" y="184" width="336" height="52" rx="6" fill="#EEF7F1"/>
+            <text x="406" y="205" font-size="13" font-weight="600" fill="#181512">State Topic Synthesizer (18 topics)</text>
+            <text x="406" y="223" font-size="11" fill="#575049">berry-electron-state.js (140d) · companions/chat/layout</text>
+            <rect x="746" y="184" width="330" height="52" rx="6" fill="#EEF7F1"/>
+            <text x="760" y="205" font-size="13" font-weight="600" fill="#181512">IPC Query &amp; Invoke Router</text>
+            <text x="760" y="223" font-size="11" fill="#575049">berry-electron-queries.js (198d) · 0 Cloud Lock-in</text>
+
+            <!-- Arrow 2 -> 3 -->
+            <path d="M560 250 L560 280" stroke="#2E8B57" stroke-width="2"/>
+            <polygon points="555,276 565,276 560,284" fill="#2E8B57"/>
+            <text x="572" y="270" font-size="11" font-weight="600" fill="#2E8B57">HTTP REST JSON · 127.0.0.1:4104 (/api/*)</text>
+
+            <!-- Layer 3: Localhost HTTP & Orchestrator -->
+            <rect x="24" y="284" width="1072" height="104" rx="10" fill="#FFFFFF" stroke="#E4DFD7" stroke-width="1.5"/>
+            <text x="44" y="310" font-size="12" font-weight="600" fill="#2E8B57" letter-spacing="0.06em">TẦNG 3 · LOCALHOST SERVER &amp; ORCHESTRATOR (src/server/)</text>
+            <rect x="44" y="322" width="330" height="52" rx="6" fill="#F3EFEA"/>
+            <text x="58" y="343" font-size="13" font-weight="600" fill="#181512">Node.js HTTP Server (Port 4104)</text>
+            <text x="58" y="361" font-size="11" fill="#575049">berry-http-server.js (174d) · 12 REST Endpoints</text>
+            <rect x="392" y="322" width="336" height="52" rx="6" fill="#F3EFEA"/>
+            <text x="406" y="343" font-size="13" font-weight="600" fill="#181512">Companion Chat Orchestrator</text>
+            <text x="406" y="361" font-size="11" fill="#575049">companion-chat-orchestrator.js (158d) · Tool Loop</text>
+            <rect x="746" y="322" width="330" height="52" rx="6" fill="#F3EFEA"/>
+            <text x="760" y="343" font-size="13" font-weight="600" fill="#181512">9 Vietnamese Fruit Companions + 31 Skills</text>
+            <text x="760" y="361" font-size="11" fill="#575049">official-companions-catalog.js (186d)</text>
+
+            <!-- Arrow 3 -> 4 -->
+            <path d="M210 388 L210 416" stroke="#2E8B57" stroke-width="2"/>
+            <path d="M560 388 L560 416" stroke="#2E8B57" stroke-width="2"/>
+            <path d="M910 388 L910 416" stroke="#2E8B57" stroke-width="2"/>
+
+            <!-- Layer 4 & 5: Execution Engines & Persistence -->
+            <rect x="24" y="416" width="340" height="180" rx="10" fill="#FFFFFF" stroke="#E4DFD7" stroke-width="1.5"/>
+            <text x="44" y="442" font-size="12" font-weight="600" fill="#2E8B57">TẦNG 4A · AGENT DOM ENGINE</text>
+            <text x="44" y="464" font-size="13" font-weight="600" fill="#181512">agent-dom-browser-service.js (153d)</text>
+            <text x="44" y="486" font-size="12" fill="#575049">• Gắn nhãn phần tử tương tác [data-oi-id]</text>
+            <text x="44" y="506" font-size="12" fill="#575049">• bóc tách H1-H3, bảng &lt;tr&gt;, link &amp; button</text>
+            <text x="44" y="526" font-size="12" fill="#575049">• Proxy HTML (/api/browser/proxy)</text>
+            <text x="44" y="546" font-size="12" fill="#575049">• Sinh Visual Artifact (Sheet / Brief)</text>
+
+            <rect x="388" y="416" width="344" height="180" rx="10" fill="#FFFFFF" stroke="#E4DFD7" stroke-width="1.5"/>
+            <text x="408" y="442" font-size="12" font-weight="600" fill="#2E8B57">TẦNG 4B · KARPATHY-WIKI MEMORY</text>
+            <text x="408" y="464" font-size="13" font-weight="600" fill="#181512">karpathy-wiki-memory-engine.js (177d)</text>
+            <text x="408" y="486" font-size="12" fill="#575049">• Pinned: PROFILE.md &amp; COMPANION.md</text>
+            <text x="408" y="506" font-size="12" fill="#575049">• Nhật ký ngày: observations/YYYY-MM-DD.md</text>
+            <text x="408" y="526" font-size="12" fill="#575049">• Thực thể: entities/companies/*.md</text>
+            <text x="408" y="546" font-size="12" fill="#575049">• Dream Consolidation (/api/memory/dream)</text>
+
+            <rect x="756" y="416" width="340" height="180" rx="10" fill="#FFFFFF" stroke="#E4DFD7" stroke-width="1.5"/>
+            <text x="776" y="442" font-size="12" font-weight="600" fill="#2E8B57">TẦNG 5 · LOCAL SQLITE STORE</text>
+            <text x="776" y="464" font-size="13" font-weight="600" fill="#181512">sqlite-workspace-store.js (192d)</text>
+            <text x="776" y="486" font-size="12" fill="#575049">• Built-in node:sqlite (DatabaseSync)</text>
+            <text x="776" y="506" font-size="12" fill="#575049">• 6 bảng: tabs, companions, chat_messages,</text>
+            <text x="776" y="526" font-size="12" fill="#575049">  routines, artifacts, meetings</text>
+            <text x="776" y="546" font-size="12" fill="#575049">• Lưu tại .berry-data/workspace.sqlite</text>
+          </svg>
+        </div>
+        <figcaption class="case-plate-caption">
+          <p>Sơ đồ kiến trúc 5 tầng của Ổi Browser 1.0.0: Không phụ thuộc đám mây, không gói npm bên ngoài.</p>
+          <cite>11 modules · 1,673 LOC · verified</cite>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section id="layers" data-pace="chapter" aria-labelledby="layers-h">
+      <h2 id="layers-h" class="ds-heading" data-level="2">Phân tích chuyên sâu 7 tính năng cốt lõi</h2>
+      <div class="register">
+        <div class="register-row" data-icon="none">
+          <h3>1. Cầu nối IPC <code>window.electronAPI</code></h3>
+          <p>Mô-đun <code>berry-electron-bridge.js</code> giả lập hoàn chỉnh tầng IPC của Electron ngay trên trình duyệt chuẩn. Mọi lệnh <code>subscribeIPCState(topic, key)</code> (18 chủ đề như <code>companions.list</code>, <code>chat.session.messages</code>, <code>routines.list</code>, <code>syncedFs.library</code>, <code>layout.tree</code>) và <code>invokeIPCQuery</code> đều được chuyển tiếp về REST API cục bộ mà không cần sửa các gói SvelteKit 5 đã biên dịch.</p>
+        </div>
+        <div class="register-row" data-icon="none">
+          <h3>2. Biệt đội 9 Trợ lý Trái cây Việt 3D</h3>
+          <p>Mô-đun <code>berry-fruit-lottie.js</code> và <code>official-companions-catalog.js</code> ánh xạ từng trợ lý (<code>Ổi</code>, <code>Măng Cụt</code>, <code>Sầu Riêng</code>, <code>Thanh Long</code>, <code>Bưởi</code>, <code>Vú Sữa</code>, <code>Xoài</code>, <code>Chôm Chôm</code>, <code>Vải</code>) tới hình nổi 3D (<code>/fruits-3d/*.png</code>) và hoạt ảnh Lottie (<code>/fruits/*.json</code>) thay thế hoàn toàn mô hình đất sét cũ.</p>
+        </div>
+        <div class="register-row" data-icon="none">
+          <h3>3. AgentDOM Browser Service (<code>[data-oi-id]</code>)</h3>
+          <p>Khi trợ lý kiểm tra một URL, <code>agent-dom-browser-service.js</code> tải HTML thực, loại bỏ script/style rác, gắn mã định danh <code>data-oi-id="oi-1..N"</code> vào từng thẻ <code>&lt;a&gt;</code>, <code>&lt;button&gt;</code>, <code>&lt;input&gt;</code>, trích xuất cây tiêu đề <code>H1–H3</code> và bảng dữ liệu <code>&lt;tr&gt;</code> để trợ lý trích dẫn chính xác phần tử trên trang.</p>
+        </div>
+        <div class="register-row" data-icon="none">
+          <h3>4. Bộ nhớ Karpathy-Wiki 3 Tầng &amp; Dream Consolidation</h3>
+          <p>Mô-đun <code>karpathy-wiki-memory-engine.js</code> lưu trữ tri thức dưới dạng file Markdown thuần: (1) Bộ nhớ ghim <code>PROFILE.md</code> &amp; <code>companions/&lt;id&gt;/COMPANION.md</code>, (2) Nhật ký quan sát theo ngày <code>observations/YYYY-MM-DD.md</code>, và (3) Đồ thị thực thể <code>entities/companies/*.md</code>. Lệnh <code>POST /api/memory/dream</code> gom các quan sát mới nhất trong ngày hợp nhất vào <code>COMPANION.md</code>.</p>
+        </div>
+        <div class="register-row" data-icon="none">
+          <h3>5. Visual Artifacts (Bảng tính &amp; Tài liệu)</h3>
+          <p>Trong mỗi lượt chat (<code>companion-chat-orchestrator.js</code>), nếu người dùng yêu cầu lập bảng/trích xuất dữ liệu (hoặc gọi <code>Vú Sữa</code> / <code>Măng Cụt</code>), hệ thống tự động tạo Artifact kiểu <code>spreadsheet</code> (cột <code>ID, Type, Content, Reference</code>); ngược lại sinh báo cáo <code>document</code> Markdown có trích dẫn <code>[data-oi-id]</code>.</p>
+        </div>
+        <div class="register-row" data-icon="none">
+          <h3>6. Kho Kỹ năng 31 Official Skills &amp; Brand Probe</h3>
+          <p>Thư mục <code>skills/</code> chứa trọn bộ 31 kỹ năng chuyên sâu đã giải nén, nổi bật là bộ máy TypeScript 48 file <code>general/visual-artifact</code> (tự động chụp web, đo độ tự tin màu sắc, trích xuất font thương hiệu và chấm điểm bố cục <code>critique.ts</code>).</p>
+        </div>
+        <div class="register-row" data-icon="none">
+          <h3>7. Lịch trình Tự động (Routines) &amp; Họp (Meetings)</h3>
+          <p>Hỗ trợ chạy tự động các quy trình định kỳ (<code>POST /api/routines/run</code>) thông qua đúng trợ lý phụ trách và bóc tách biên bản cuộc họp thành danh sách <code>Action Items</code> kèm ghi nhận tự động vào Karpathy-Wiki.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ds-shell-footer">
+    <div class="ds-shell-footer-inner">
+      <nav class="ds-shell-footer-nav" aria-label="Footer">
+        <a class="ds-tab" href="index.html">Trang chủ</a>
+        <a class="ds-tab" href="https://github.com/jangtrinh/oi-browser">GitHub</a>
+        <a class="ds-tab" href="#main">Lên đầu trang</a>
+      </nav>
+    </div>
+  </footer>
+</div>
+<script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="jangtrinh" data-description="Support me on Buy me a coffee!" data-message="" data-color="#FF813F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</body>
+</html>
