@@ -41,3 +41,6 @@ _Declared stance for `Ổi Browser (oi-browser)`. Every `/ui:*` flow and design 
 - `design/ontology.tokens.json` — 3-tier DTCG token hierarchy (Primitives -> Semantic -> Composite)
 - `design/component-registry.json` — 24 registered components across Primitives, Molecules, and Composites
 - `design/flow.json` — 11-screen IA flow graph verified by `ui flow lint`
+
+- Pastel green pill badges (`#dcfce7` / `#166534`, e.g. `5/5 CLIs Ready`, `AUTO 5/5`) and uppercase gray role tags (`AUTO`, `CLAUDE`, `AGY`) — banned because the native DS expresses status exclusively via a 6px micro-dot + plain `text-xs text-muted-foreground` (`• In use`, `• Connected`) — evidence: `src/client/berry-cli-terminal-dock.js`
+- Shaded card header banners (`bg-card/45 border-b`) and verbose multi-clause descriptions on Settings rows — banned in favor of unboxed `OptionsGroupHeader` titles and concise 1-2 word row labels — evidence: `public/_app/immutable/chunks/Dp-6Tp0Z.js`
