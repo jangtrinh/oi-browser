@@ -153,7 +153,7 @@
       "ts": "2026-10-28T00:30:11.713Z"
     }
   ],
-  "compiledHash": "sha256-zPmSseeDsNfCW5qBaj8KSTpSwoMby-jS3ePpDPtCXEA",
+  "compiledHash": "sha256-uQJv4bpoQDecwntg9mvW4RIEoZ9U00fuhbITsnvLW7M",
   "createdAt": "2026-10-28T00:28:54.949Z",
   "generation": 26,
   "intent": "imported from design/tokens.json",
@@ -162,6 +162,6 @@
     "family": "imported",
     "slug": "imported"
   },
-  "registryHash": "sha256-n3kB3Mtm8SXfEopS0IuXiwtpmkLgyzRVMKgTHEli3L4",
+  "registryHash": "sha256-djf2oVarfdhFnrIoPVYecLC3a5baZEx0-8yQWjqgA6s",
   "version": "1.0.0"
 }

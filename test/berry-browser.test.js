@@ -162,5 +162,39 @@ test("Ổi Browser full-stack verification suite", async (t) => {
     assert.equal(flow.screens.length, 11);
     const soul = fs.readFileSync(new URL("../design/soul.md", import.meta.url), "utf8");
     assert.ok(soul.includes("status: ratified"));
+    const dockJs = fs.readFileSync(new URL("../src/client/berry-cli-terminal-dock.js", import.meta.url), "utf8");
+    assert.ok(!dockJs.includes("monospace"), "CLI Core must not use monospace fonts");
+  });
+
+  await t.test("OpenJarvis 5 Primitives: Adaptive Cascade Router, Intelligence-Per-Watt Telemetry, SQLite FTS5 BM25, Guardrails & Progressive Skills XML", async () => {
+    const telRes = await fetch(`${baseUrl}/api/telemetry`);
+    assert.equal(telRes.status, 200);
+    const telData = await telRes.json();
+    assert.ok(telData.telemetry.intelligencePerWattScore > 0);
+    assert.ok(telData.telemetry.totalTokens > 0);
+    assert.equal(telData.telemetry.totalCostSavedUsd, undefined, "Telemetry must be 100% free of pricing/credit metrics");
+    assert.equal(telData.skillCatalog.totalIndexedSkills, 31);
+    assert.ok(telData.fts.indexedDocs >= 10);
+
+    const searchRes = await fetch(`${baseUrl}/api/memory/search?q=Karpathy`);
+    assert.equal(searchRes.status, 200);
+    const searchData = await searchRes.json();
+    assert.ok(searchData.results.length > 0);
+    assert.ok(searchData.engine.includes("FTS5 BM25"));
+
+    const execSecretRes = await fetch(`${baseUrl}/api/cli/exec`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        harnessId: "auto",
+        companionId: "developer-dana",
+        prompt: "Debug typescript function with token sk-proj1234567890abcdefghij",
+        mode: "simulated"
+      })
+    });
+    const execSecretData = await execSecretRes.json();
+    assert.equal(execSecretData.run.classification.category, "code");
+    assert.ok(!execSecretData.run.commandLine.includes("sk-proj1234567890abcdefghij"), "Guardrails must redact API keys before CLI dispatch");
+    assert.ok(execSecretData.cliStatus.guardrails.totalRedactions >= 1);
   });
 });

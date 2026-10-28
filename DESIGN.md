@@ -63,7 +63,6 @@ Literal scales for Ổi Browser brand colors, 9 Vietnamese fruit companion accen
 | `primitive-radius.pill` | `dimension` | `9999px` |
 | `primitive-typography.font-sans` | `fontFamily` | `Inter, -apple-system, BlinkMacSystemFont, sans-serif` |
 | `primitive-typography.font-display` | `fontFamily` | `Playfair Display, Georgia, serif` |
-| `primitive-typography.font-mono` | `fontFamily` | `SFMono-Regular, Menlo, Monaco, Consolas, monospace` |
 | `primitive-typography.size-xs` | `dimension` | `11px` |
 | `primitive-typography.size-sm` | `dimension` | `12px` |
 | `primitive-typography.size-caption` | `dimension` | `13px` |
@@ -358,7 +357,6 @@ Automated cron routine card in /routines showing companion avatar, cron schedule
   - `colors.success` → #15803d
   - `radius.radius-lg` → 14px
   - `spacing.space-4` → 16px
-  - `typography.font-family-mono` → SFMono-Regular, Menlo, Monaco, Consolas, monospace
   - `typography.font-family-sans` → Inter, -apple-system, BlinkMacSystemFont, sans-serif
   - `typography.font-size-title` → 16px
 
@@ -377,7 +375,6 @@ Official skill card in /skills displaying skill slug, category badge, descriptio
   - `colors.primary` → #b9382c
   - `radius.radius-lg` → 14px
   - `spacing.space-4` → 16px
-  - `typography.font-family-mono` → SFMono-Regular, Menlo, Monaco, Consolas, monospace
   - `typography.font-family-sans` → Inter, -apple-system, BlinkMacSystemFont, sans-serif
   - `typography.font-size-caption` → 13px
   - `typography.font-size-title` → 16px
@@ -398,7 +395,6 @@ Interactive 3D browser-window starter kit card on /use-cases featuring /command 
   - `radius.radius-xl` → 20px
   - `spacing.space-4` → 16px
   - `spacing.space-5` → 20px
-  - `typography.font-family-mono` → SFMono-Regular, Menlo, Monaco, Consolas, monospace
   - `typography.font-family-sans` → Inter, -apple-system, BlinkMacSystemFont, sans-serif
   - `typography.font-size-body` → 14px
   - `typography.font-size-heading` → 20px
@@ -420,7 +416,6 @@ Expandable multi-step agent execution trace card in Chat (Updated crm.md -> Sear
   - `radius.radius-lg` → 14px
   - `spacing.space-3` → 12px
   - `spacing.space-4` → 16px
-  - `typography.font-family-mono` → SFMono-Regular, Menlo, Monaco, Consolas, monospace
   - `typography.font-family-sans` → Inter, -apple-system, BlinkMacSystemFont, sans-serif
   - `typography.font-size-small` → 12px
 
@@ -441,7 +436,6 @@ Chronological audit feed of companion tool calls, DOM inspections, CLI dispatche
   - `radius.radius-md` → 10px
   - `spacing.space-3` → 12px
   - `spacing.space-4` → 16px
-  - `typography.font-family-mono` → SFMono-Regular, Menlo, Monaco, Consolas, monospace
   - `typography.font-family-sans` → Inter, -apple-system, BlinkMacSystemFont, sans-serif
   - `typography.font-size-body` → 14px
 
@@ -462,7 +456,6 @@ Structured SQLite, Karpathy-Wiki, and Spreadsheet visual artifact data grid in /
   - `radius.radius-lg` → 14px
   - `spacing.space-3` → 12px
   - `spacing.space-4` → 16px
-  - `typography.font-family-mono` → SFMono-Regular, Menlo, Monaco, Consolas, monospace
   - `typography.font-family-sans` → Inter, -apple-system, BlinkMacSystemFont, sans-serif
   - `typography.font-size-small` → 12px
 
@@ -484,12 +477,11 @@ Semantic qualification route badge (Route: Priority, Route: Explore, Route: Nurt
   - `radius.radius-sm` → 6px
   - `spacing.space-1` → 4px
   - `spacing.space-2` → 8px
-  - `typography.font-family-mono` → SFMono-Regular, Menlo, Monaco, Consolas, monospace
   - `typography.font-size-xs` → 11px
 
 ### Badge/StatusCount
 
-Monospace count and status badge used on Searched the web (3), Routines (In 1h), and CLI Core (5/5)
+Tabular sans-serif count and status badge used on Searched the web (3), Routines (In 1h), and CLI Core (5/5)
 
 - **Variants:** State=Active, State=Default, State=Disabled, State=Focus, State=Hover, Tone=Neutral, Tone=Primary, Tone=Success
 - **States:** —
@@ -503,7 +495,6 @@ Monospace count and status badge used on Searched the web (3), Routines (In 1h),
   - `radius.radius-pill` → 9999px
   - `spacing.space-1` → 4px
   - `spacing.space-2` → 8px
-  - `typography.font-family-mono` → SFMono-Regular, Menlo, Monaco, Consolas, monospace
   - `typography.font-size-xs` → 11px
 
 ## form
@@ -681,7 +672,6 @@ Bottom-left (left: 20px; bottom: 20px) floating CLI Core status pill (AUTO 5/5) 
   - `spacing.cli-dock-offset` → 20px
   - `spacing.space-2` → 8px
   - `spacing.space-3` → 12px
-  - `typography.font-family-mono` → SFMono-Regular, Menlo, Monaco, Consolas, monospace
   - `typography.font-family-sans` → Inter, -apple-system, BlinkMacSystemFont, sans-serif
   - `typography.font-size-xs` → 11px
 

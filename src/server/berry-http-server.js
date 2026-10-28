@@ -7,6 +7,7 @@ import { KarpathyWikiMemoryEngine } from "./karpathy-wiki-memory-engine.js";
 import { AgentDOMBrowserService } from "./agent-dom-browser-service.js";
 import { CompanionChatOrchestrator } from "./companion-chat-orchestrator.js";
 import { CliHarnessRouter } from "./cli-harness-router.js";
+import { WikiFtsIndex } from "./wiki-fts-index.js";
 import { OFFICIAL_SKILLS } from "./official-companions-catalog.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -37,9 +38,10 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
   const wikiDir = path.join(dataDir, "karpathy-wiki");
   const store = new SqliteWorkspaceStore(path.join(dataDir, "workspace.sqlite"));
   const memory = new KarpathyWikiMemoryEngine(wikiDir);
+  const wikiFts = new WikiFtsIndex({ db: store.db, memory });
   const domService = new AgentDOMBrowserService();
   const cliRouter = new CliHarnessRouter({ projectRoot: PROJECT_ROOT, wikiDir, skillsDir: path.join(PROJECT_ROOT, "skills") });
-  const orchestrator = new CompanionChatOrchestrator({ store, memory, domService, cliRouter });
+  const orchestrator = new CompanionChatOrchestrator({ store, memory, domService, cliRouter, wikiFts });
   const publicDir = path.join(PROJECT_ROOT, "public");
   const clientDir = path.join(PROJECT_ROOT, "src/client");
 
@@ -51,25 +53,25 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
         return sendJson(res, 200, {
           tabs: store.listTabs(), companions: store.listCompanions(), routines: store.listRoutines(),
           artifacts: store.listArtifacts(), meetings: store.listMeetings(), memoryFiles: memory.listFiles(),
-          messages: store.listAllMessages(), officialSkills: OFFICIAL_SKILLS, cliStatus: cliRouter.getStatus()
+          messages: store.listAllMessages(), officialSkills: OFFICIAL_SKILLS, cliStatus: cliRouter.getStatus(),
+          ftsStatus: { engine: "SQLite FTS5 BM25", indexedDocs: wikiFts.getDocCount() }
         });
       }
-
-      if (pathname === "/api/cli/status" && req.method === "GET") {
-        return sendJson(res, 200, cliRouter.getStatus());
+      if (pathname === "/api/cli/status" && req.method === "GET") return sendJson(res, 200, cliRouter.getStatus());
+      if (pathname === "/api/telemetry" && req.method === "GET") {
+        return sendJson(res, 200, {
+          telemetry: cliRouter.telemetry.getSummary(), guardrails: cliRouter.guardrails.getStatus(),
+          skillCatalog: cliRouter.skillCatalog.getStatus(), fts: { indexedDocs: wikiFts.getDocCount() }
+        });
       }
-
       if (pathname === "/api/cli/select" && req.method === "POST") {
         const { harnessId } = await readJsonBody(req);
         return sendJson(res, 200, cliRouter.setActiveHarness(harnessId));
       }
-
       if (pathname === "/api/cli/exec" && req.method === "POST") {
-        const body = await readJsonBody(req);
-        const run = await cliRouter.executeCommand(body);
+        const run = await cliRouter.executeCommand(await readJsonBody(req));
         return sendJson(res, 200, { run, cliStatus: cliRouter.getStatus() });
       }
-
       if (pathname === "/api/tabs" && req.method === "POST") {
         const body = await readJsonBody(req);
         if (body.action === "close") return sendJson(res, 200, { tabs: store.closeTab(body.id) });
@@ -84,17 +86,17 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
         const tab = store.createTab({ title: body.title || url, url, surfaceKind, activate: true });
         return sendJson(res, 200, { tab, tabs: store.listTabs() });
       }
-
       if (pathname === "/api/companions" && req.method === "POST") {
         const created = store.createCompanion(await readJsonBody(req));
-        memory.writeFile(`companions/${created.id}/COMPANION.md`, `# ${created.name} — Companion Memory\n\n- **Role**: ${created.role}\n- **Summary**: ${created.summary}\n`);
+        const rel = `companions/${created.id}/COMPANION.md`;
+        const body = `# ${created.name} — Companion Memory\n\n- **Role**: ${created.role}\n- **Summary**: ${created.summary}\n`;
+        memory.writeFile(rel, body);
+        wikiFts.indexDocument({ path: rel, title: created.name, category: "companions", content: body });
         return sendJson(res, 200, { companion: created, companions: store.listCompanions() });
       }
-
       if (pathname === "/api/chat" && req.method === "GET") {
         return sendJson(res, 200, { messages: store.listMessages(searchParams.get("companionId") || "consulting-cora") });
       }
-
       if (pathname === "/api/chat" && req.method === "POST") {
         const body = await readJsonBody(req);
         const result = await orchestrator.handleUserTurn(body);
@@ -104,23 +106,19 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
           cliStatus: cliRouter.getStatus()
         });
       }
-
       if (pathname === "/api/browser/inspect" && req.method === "GET") {
         const snap = await domService.inspectUrl(searchParams.get("url") || "https://github.com/jangtrinh/oi-browser");
         return sendJson(res, 200, { ...snap, html: undefined });
       }
-
       if (pathname === "/api/browser/proxy" && req.method === "GET") {
         const html = await domService.renderProxiedHtml(searchParams.get("url") || "https://github.com/jangtrinh/oi-browser");
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
         return res.end(html);
       }
-
       if (pathname === "/api/routines" && req.method === "POST") {
         const routine = store.createRoutine(await readJsonBody(req));
         return sendJson(res, 200, { routine, routines: store.listRoutines() });
       }
-
       if (pathname === "/api/routines/run" && req.method === "POST") {
         const { id } = await readJsonBody(req);
         const routine = store.listRoutines().find((r) => r.id === id);
@@ -129,27 +127,29 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
         const updated = store.recordRoutineRun(id, turn.assistantMessage.content);
         return sendJson(res, 200, { routine: updated, routines: store.listRoutines(), artifact: turn.artifact });
       }
-
+      if (pathname === "/api/memory/search" && req.method === "GET") {
+        return sendJson(res, 200, wikiFts.search(searchParams.get("q") || "", Number(searchParams.get("limit")) || 5));
+      }
       if (pathname === "/api/memory/file" && req.method === "GET") {
         const filePath = searchParams.get("path") || "PROFILE.md";
         return sendJson(res, 200, { path: filePath, content: memory.readFile(filePath), files: memory.listFiles() });
       }
-
       if (pathname === "/api/memory/file" && req.method === "POST") {
         const { path: filePath, content } = await readJsonBody(req);
-        return sendJson(res, 200, { saved: memory.writeFile(filePath, content), files: memory.listFiles() });
+        const saved = memory.writeFile(filePath, content);
+        wikiFts.indexDocument({ path: filePath, title: filePath, category: filePath.split("/")[0] || "profile", content });
+        return sendJson(res, 200, { saved, files: memory.listFiles() });
       }
-
       if (pathname === "/api/memory/dream" && req.method === "POST") {
         const { companionId } = await readJsonBody(req);
-        return sendJson(res, 200, { dream: memory.runDreamConsolidation(companionId || "executive-ellis"), files: memory.listFiles() });
+        const dream = memory.runDreamConsolidation(companionId || "executive-ellis");
+        wikiFts.syncAllFromDisk();
+        return sendJson(res, 200, { dream, files: memory.listFiles() });
       }
-
       if (pathname === "/api/artifacts" && req.method === "POST") {
         const artifact = store.createArtifact(await readJsonBody(req));
         return sendJson(res, 200, { artifact, artifacts: store.listArtifacts() });
       }
-
       if (pathname === "/api/meetings" && req.method === "POST") {
         const body = await readJsonBody(req);
         const lines = String(body.transcriptText || "").split(/[.!?\n]+/).map((s) => s.trim()).filter(Boolean);
@@ -157,6 +157,7 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
         const summaryMarkdown = `### Meeting Summary\n- **Title**: ${body.title}\n- **Key Points**: ${lines.slice(0, 3).join("; ") || "Recorded session"}`;
         const meeting = store.createMeeting({ ...body, summaryMarkdown, actionItems });
         memory.appendObservation({ companionId: "executive-ellis", summary: `Transcribed meeting "${meeting.title}" (${actionItems.length} action items)` });
+        wikiFts.syncAllFromDisk();
         return sendJson(res, 200, { meeting, meetings: store.listMeetings() });
       }
 
@@ -168,7 +169,6 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
           return fs.createReadStream(candidate).pipe(res);
         }
       }
-
       if (!path.extname(relPath)) {
         const spaHtml = path.join(publicDir, "index.html");
         if (fs.existsSync(spaHtml)) {
@@ -182,7 +182,7 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
     }
   });
 
-  return { server, store, memory, domService, cliRouter, orchestrator };
+  return { server, store, memory, wikiFts, domService, cliRouter, orchestrator };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

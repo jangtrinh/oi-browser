@@ -24,6 +24,15 @@
         right: auto !important;
         left: 0 !important;
       }
+      /* 100% Self-Service Mode: Hide all legacy cloud credit, billing, plan & referral UI */
+      [data-testid*="credit"],
+      [data-testid="pending-invite-banner"],
+      [data-testid="invite-share-btn"],
+      section#plan,
+      a[href="/settings/credits"],
+      a[href="/settings/team"] {
+        display: none !important;
+      }
     </style>
     <script src="/fruits/lottie.min.js"></script>
     <script>

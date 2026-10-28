@@ -38,7 +38,7 @@
         "spacing.space-1",
         "spacing.space-2",
         "radius.radius-sm",
-        "typography.font-family-mono",
+        "typography.font-family-sans",
         "typography.font-size-xs"
       ],
       "variants": [
@@ -54,7 +54,7 @@
     },
     {
       "category": "feedback",
-      "description": "Monospace count and status badge used on Searched the web (3), Routines (In 1h), and CLI Core (5/5)",
+      "description": "Tabular sans-serif count and status badge used on Searched the web (3), Routines (In 1h), and CLI Core (5/5)",
       "markup": "<span class=\"badge-status-count\">5/5</span>\n",
       "name": "Badge/StatusCount",
       "scope": "local",
@@ -67,7 +67,7 @@
         "spacing.space-1",
         "spacing.space-2",
         "radius.radius-pill",
-        "typography.font-family-mono",
+        "typography.font-family-sans",
         "typography.font-size-xs"
       ],
       "variants": [
@@ -262,7 +262,7 @@
         "spacing.space-4",
         "radius.radius-lg",
         "typography.font-family-sans",
-        "typography.font-family-mono",
+        "typography.font-family-sans",
         "typography.font-size-title"
       ],
       "variants": [
@@ -290,7 +290,7 @@
         "spacing.space-4",
         "radius.radius-lg",
         "typography.font-family-sans",
-        "typography.font-family-mono",
+        "typography.font-family-sans",
         "typography.font-size-title",
         "typography.font-size-caption"
       ],
@@ -348,7 +348,7 @@
         "spacing.space-5",
         "radius.radius-xl",
         "typography.font-family-sans",
-        "typography.font-family-mono",
+        "typography.font-family-sans",
         "typography.font-size-heading",
         "typography.font-size-body"
       ],
@@ -380,7 +380,7 @@
         "spacing.space-4",
         "radius.radius-lg",
         "typography.font-family-sans",
-        "typography.font-family-mono",
+        "typography.font-family-sans",
         "typography.font-size-small"
       ],
       "variants": [
@@ -522,7 +522,7 @@
         "spacing.space-4",
         "radius.radius-md",
         "typography.font-family-sans",
-        "typography.font-family-mono",
+        "typography.font-family-sans",
         "typography.font-size-body"
       ],
       "variants": [
@@ -635,7 +635,7 @@
         "spacing.space-3",
         "radius.radius-pill",
         "typography.font-family-sans",
-        "typography.font-family-mono",
+        "typography.font-family-sans",
         "typography.font-size-xs"
       ],
       "variants": [
@@ -665,7 +665,7 @@
         "spacing.space-4",
         "radius.radius-lg",
         "typography.font-family-sans",
-        "typography.font-family-mono",
+        "typography.font-family-sans",
         "typography.font-size-small"
       ],
       "variants": [

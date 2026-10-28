@@ -22,7 +22,7 @@ _Declared stance for `Ổi Browser (oi-browser)`. Every `/ui:*` flow and design 
 - Always dock the 290px Navigation Sidebar on the Right-Hand Side (`Layout/RightHandSidebarShell`) with a 1px left hairline border (`border-left: 1px solid oklch(var(--border) / 0.65)`) — evidence: `public/index.html`
 - Always pair every companion session and starter card with its canonical short Vietnamese fruit name (`Ổi`, `Măng Cụt`, `Sầu Riêng`, `Thanh Long`, `Bưởi`, `Vú Sữa`, `Xoài`, `Chôm Chôm`, `Vải`) and 3D fruit PNG asset — evidence: `src/server/official-companions-catalog.js`
 - Always maintain >= 4.5:1 WCAG AA contrast across all 15 declared text x surface token pairs and 8 interaction-state pairs — evidence: `design/design.tokens.json`
-- Always render structured agent execution steps inside `Content/WorkTraceAccordion` (`Searched the web`, `Read pages`, `Used CLI harness`, `Updated crm.md`) with monospace count badges (`Badge/StatusCount`) — evidence: `src/client/berry-electron-state.js`
+- Always render structured agent execution steps inside `Content/WorkTraceAccordion` (`Searched the web`, `Read pages`, `Used CLI harness`, `Updated crm.md`) with tabular sans-serif count badges (`Badge/StatusCount`) — evidence: `src/client/berry-electron-state.js`
 - Always tag extracted interactive DOM elements with `data-oi-id="oi-1..N"` in `AgentDOMBrowserService` — evidence: `src/server/agent-dom-browser-service.js`
 - Always expose all 6 interactive states (`Default`, `Hover`, `Active`, `Focus`, `Disabled`, plus `Empty` for data containers) across the 24 registered components — evidence: `design/component-registry.json`
 

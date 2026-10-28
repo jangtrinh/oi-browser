@@ -407,10 +407,6 @@
       "$type": "fontFamily",
       "$value": "Playfair Display, Georgia, serif"
     },
-    "font-family-mono": {
-      "$type": "fontFamily",
-      "$value": "SFMono-Regular, Menlo, Monaco, Consolas, monospace"
-    },
     "font-family-sans": {
       "$type": "fontFamily",
       "$value": "Inter, -apple-system, BlinkMacSystemFont, sans-serif"

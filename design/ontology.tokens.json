@@ -194,10 +194,6 @@
       "$type": "fontFamily",
       "$value": "Playfair Display, Georgia, serif"
     },
-    "font-mono": {
-      "$type": "fontFamily",
-      "$value": "SFMono-Regular, Menlo, Monaco, Consolas, monospace"
-    },
     "size-xs": {
       "$type": "dimension",
       "$value": "11px"

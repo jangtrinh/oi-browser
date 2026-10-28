@@ -2,6 +2,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { classifyQueryComplexity, resolveCascadePlan } from "./query-complexity-router.js";
+import { LocalTelemetryEngine } from "./local-telemetry-engine.js";
+import { GuardrailsSanitizer } from "./guardrails-sanitizer.js";
+import { SkillCatalogLoader } from "./skill-catalog-loader.js";
 
 export const COMPANION_CLI_AFFINITY = {
   "consulting-cora": "claude",
@@ -16,13 +20,13 @@ export const COMPANION_CLI_AFFINITY = {
 };
 
 const HARNESS_SPECS = [
-  { id: "auto", label: "Auto (Theo Companion)", binary: null, badge: "AUTO", role: "Tự động chọn CLI tối ưu theo từng loại quả Companion" },
+  { id: "auto", label: "Auto (OpenJarvis Adaptive)", binary: null, badge: "AUTO", role: "Tự động phân tích độ phức tạp câu hỏi & điều phối theo từng loại quả Companion" },
   { id: "claude", label: "Claude Code CLI", binary: "claude", badge: "CLAUDE", candidates: ["/opt/homebrew/bin/claude", "/usr/local/bin/claude"], role: "Chiến lược, phân tích sâu & tổng hợp tài liệu" },
   { id: "agy", label: "Antigravity CLI", binary: "agy", badge: "AGY", candidates: ["/opt/homebrew/bin/agy", "/usr/local/bin/agy"], role: "Agentic điều phối đa bước, Deep Research & JSON Schema" },
   { id: "codex", label: "OpenAI Codex CLI", binary: "codex", badge: "CODEX", candidates: ["/opt/homebrew/bin/codex", "/usr/local/bin/codex"], role: "Kỹ thuật, bóc tách bảng biểu & mã nguồn" },
   { id: "grok", label: "xAI Grok Build", binary: "grok", badge: "GROK", candidates: [path.join(os.homedir(), ".grok/bin/grok"), "/opt/homebrew/bin/grok"], role: "Tốc độ cao, Sales Outreach & Growth Copy" },
   { id: "orca", label: "Orca ADE Runtime", binary: "orca", badge: "ORCA", candidates: ["/opt/homebrew/bin/orca", "/Applications/Orca.app/Contents/Resources/bin/orca"], role: "Quản lý phiên Worker & Terminal Orchestration" },
-  { id: "local", label: "Local Deterministic", binary: null, badge: "LOCAL", role: "Lõi phản hồi tức thì (0ms, không cần CLI ngoài)" }
+  { id: "local", label: "Local Deterministic", binary: null, badge: "LOCAL", role: "Lõi phản hồi tức thì (0ms, tự vận hành nội bộ)" }
 ];
 
 function resolveBinaryPath(spec) {
@@ -44,6 +48,9 @@ export class CliHarnessRouter {
     this.skillsDir = skillsDir || path.join(this.projectRoot, "skills");
     this.activeHarnessId = "auto";
     this.recentRuns = [];
+    this.telemetry = new LocalTelemetryEngine();
+    this.guardrails = new GuardrailsSanitizer();
+    this.skillCatalog = new SkillCatalogLoader(this.skillsDir);
     this.harnesses = this.discoverHarnesses();
     this.recordBootProbe();
   }
@@ -64,10 +71,10 @@ export class CliHarnessRouter {
       harnessId: "orca",
       resolvedHarness: "orca",
       companionId: "system",
-      commandLine: "orca-style harness discovery probe",
+      commandLine: "openjarvis-adaptive harness discovery probe",
       exitCode: 0,
       durationMs: 4,
-      stdout: `Detected ${installedBins.length} AI CLI harnesses on host:\n` + installedBins.map((b) => `  ✓ ${b}`).join("\n")
+      stdout: `Detected ${installedBins.length} local CLI harnesses on host:\n` + installedBins.map((b) => `  - ${b}`).join("\n")
     });
   }
 
@@ -76,12 +83,16 @@ export class CliHarnessRouter {
     return this.getStatus();
   }
 
-  resolveForCompanion(companionId, requestedHarnessId) {
-    const pick = requestedHarnessId || this.activeHarnessId || "auto";
-    const targetId = pick === "auto" ? (COMPANION_CLI_AFFINITY[companionId] || "claude") : pick;
-    const found = this.harnesses.find((h) => h.id === targetId);
-    if (found && found.installed) return found;
-    return this.harnesses.find((h) => h.id === "local");
+  resolveForCompanion(companionId, requestedHarnessId, prompt = "") {
+    const plan = resolveCascadePlan({
+      companionId,
+      requestedHarnessId,
+      activeHarnessId: this.activeHarnessId,
+      prompt,
+      harnesses: this.harnesses,
+      companionAffinities: COMPANION_CLI_AFFINITY
+    });
+    return { ...plan.primaryHarness, cascadeChain: plan.cascadeChain, classification: plan.classification };
   }
 
   resolveSkillFiles(skills = []) {
@@ -108,76 +119,66 @@ export class CliHarnessRouter {
         "--disable-web-search", "--no-subagents", "--max-turns", "1", "--tools", "read_file"
       ];
     }
-    if (harness.id === "agy") return ["-p", trimmed, "--output-format", "text"];
-    if (harness.id === "claude") return ["-p", trimmed, "--output-format", "text"];
+    if (harness.id === "agy" || harness.id === "claude") return ["-p", trimmed, "--output-format", "text"];
     return [trimmed];
   }
 
   async executeCommand({ harnessId, companionId = "consulting-cora", prompt = "status", mode = "exec", timeoutMs = 28000 }) {
-    const harness = this.resolveForCompanion(companionId, harnessId);
+    const sanitized = this.guardrails.sanitizeText(prompt, companionId);
+    const cleanPrompt = sanitized.cleanText;
+    const resolved = this.resolveForCompanion(companionId, harnessId, cleanPrompt);
     const started = Date.now();
-    if (!harness.binaryPath || harness.id === "local" || mode === "simulated") {
+
+    if (!resolved.binaryPath || resolved.id === "local" || mode === "simulated") {
+      const durationMs = Math.max(1, Date.now() - started);
+      const stdout = `[${resolved.label}] Executed grounded turn for ${companionId} (${resolved.classification?.label || "General"} · cascade: ${(resolved.cascadeChain || []).join(" -> ")}).`;
+      const tel = this.telemetry.recordExecution({
+        harnessId: resolved.id, companionId, prompt: cleanPrompt, stdout, durationMs, category: resolved.classification?.category
+      });
       const entry = {
-        id: `run-${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        harnessId: harnessId || this.activeHarnessId,
-        resolvedHarness: harness.id,
-        binaryPath: harness.binaryPath || "internal://deterministic-core",
-        companionId,
-        commandLine: `${harness.binary || "oi-local-core"} -p "${String(prompt).slice(0, 72)}"`,
-        exitCode: 0,
-        durationMs: Math.max(1, Date.now() - started),
-        stdout: `[${harness.label}] Executed grounded turn for ${companionId} with Karpathy-Wiki (${this.wikiDir}).`
+        id: tel.id, timestamp: tel.timestamp, harnessId: harnessId || this.activeHarnessId, resolvedHarness: resolved.id,
+        binaryPath: resolved.binaryPath || "internal://deterministic-core", companionId,
+        commandLine: `${resolved.binary || "oi-local-core"} -p "${String(cleanPrompt).slice(0, 72)}"`,
+        exitCode: 0, durationMs, stdout, cascadeChain: resolved.cascadeChain, classification: resolved.classification
       };
       this.recentRuns.unshift(entry);
       this.recentRuns = this.recentRuns.slice(0, 25);
       return entry;
     }
 
-    const args = this.buildCliArgs(harness, prompt, mode === "raw");
-    const commandLine = `${harness.binaryPath} ${args.map((a) => (a.includes(" ") ? `"${a.slice(0, 60)}"` : a)).join(" ")}`;
+    const args = this.buildCliArgs(resolved, cleanPrompt, mode === "raw");
+    const commandLine = `${resolved.binaryPath} ${args.map((a) => (a.includes(" ") ? `"${a.slice(0, 60)}"` : a)).join(" ")}`;
     const result = await new Promise((resolve) => {
-      let stdout = "";
-      let stderr = "";
-      let settled = false;
-      const leanEnv = harness.id === "grok" ? {
+      let stdout = "", stderr = "", settled = false;
+      const leanEnv = resolved.id === "grok" ? {
         GROK_CLAUDE_SKILLS_ENABLED: "false", GROK_CLAUDE_AGENTS_ENABLED: "false", GROK_CLAUDE_RULES_ENABLED: "false",
         GROK_CLAUDE_HOOKS_ENABLED: "false", GROK_CLAUDE_MCPS_ENABLED: "false", GROK_CURSOR_SKILLS_ENABLED: "false",
         GROK_CURSOR_AGENTS_ENABLED: "false", GROK_CURSOR_RULES_ENABLED: "false", GROK_CURSOR_HOOKS_ENABLED: "false",
         GROK_CURSOR_MCPS_ENABLED: "false", GROK_MEMORY: "0"
       } : {};
-      const child = spawn(harness.binaryPath, args, {
-        cwd: this.projectRoot,
-        env: { ...process.env, NO_COLOR: "1", ...leanEnv }
-      });
+      const child = spawn(resolved.binaryPath, args, { cwd: this.projectRoot, env: { ...process.env, NO_COLOR: "1", ...leanEnv } });
       const timer = setTimeout(() => {
         if (!settled) {
           settled = true;
           try { child.kill("SIGTERM"); } catch {}
-          resolve({ exitCode: 0, stdout: stdout || `[${harness.label}] Streamed prompt to ${harness.binaryPath} (bounded ${timeoutMs}ms window).`, stderr });
+          resolve({ exitCode: 0, stdout: stdout || `[${resolved.label}] Streamed prompt to ${resolved.binaryPath} (${timeoutMs}ms window).`, stderr });
         }
       }, timeoutMs);
       child.stdout.on("data", (d) => { stdout += d.toString(); });
       child.stderr.on("data", (d) => { stderr += d.toString(); });
-      child.on("error", (err) => {
-        if (!settled) { settled = true; clearTimeout(timer); resolve({ exitCode: 1, stdout, stderr: err.message }); }
-      });
-      child.on("close", (code) => {
-        if (!settled) { settled = true; clearTimeout(timer); resolve({ exitCode: code ?? 0, stdout, stderr }); }
-      });
+      child.on("error", (err) => { if (!settled) { settled = true; clearTimeout(timer); resolve({ exitCode: 1, stdout, stderr: err.message }); } });
+      child.on("close", (code) => { if (!settled) { settled = true; clearTimeout(timer); resolve({ exitCode: code ?? 0, stdout, stderr }); } });
     });
 
+    const durationMs = Math.max(1, Date.now() - started);
+    const stdout = (result.stdout || result.stderr || `[${resolved.label}] Completed (exit ${result.exitCode}).`).trim().slice(0, 4000);
+    const tel = this.telemetry.recordExecution({
+      harnessId: resolved.id, companionId, prompt: cleanPrompt, stdout, durationMs, category: resolved.classification?.category, fallbackUsed: result.exitCode !== 0
+    });
     const entry = {
-      id: `run-${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      harnessId: harnessId || this.activeHarnessId,
-      resolvedHarness: harness.id,
-      binaryPath: harness.binaryPath,
-      companionId,
-      commandLine,
-      exitCode: result.exitCode,
-      durationMs: Date.now() - started,
-      stdout: (result.stdout || result.stderr || `[${harness.label}] Completed (exit ${result.exitCode}).`).trim().slice(0, 4000)
+      id: tel.id, timestamp: tel.timestamp, harnessId: harnessId || this.activeHarnessId, resolvedHarness: resolved.id,
+      binaryPath: resolved.binaryPath, companionId, commandLine, exitCode: result.exitCode, durationMs, stdout,
+      cascadeChain: resolved.cascadeChain, classification: resolved.classification
     };
     this.recentRuns.unshift(entry);
     this.recentRuns = this.recentRuns.slice(0, 25);
@@ -189,7 +190,10 @@ export class CliHarnessRouter {
       activeHarnessId: this.activeHarnessId,
       harnesses: this.harnesses,
       companionAffinities: COMPANION_CLI_AFFINITY,
-      recentRuns: this.recentRuns.slice(0, 15)
+      recentRuns: this.recentRuns.slice(0, 15),
+      telemetry: this.telemetry.getSummary(),
+      guardrails: this.guardrails.getStatus(),
+      skillCatalog: this.skillCatalog.getStatus()
     };
   }
 }

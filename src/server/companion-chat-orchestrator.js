@@ -1,9 +1,10 @@
 export class CompanionChatOrchestrator {
-  constructor({ store, memory, domService, cliRouter }) {
+  constructor({ store, memory, domService, cliRouter, wikiFts }) {
     this.store = store;
     this.memory = memory;
     this.domService = domService;
     this.cliRouter = cliRouter;
+    this.wikiFts = wikiFts || null;
   }
 
   async handleUserTurn({ companionId = "consulting-cora", message, activeUrl, harnessId, liveCli = false }) {
@@ -21,6 +22,11 @@ export class CompanionChatOrchestrator {
     let createdArtifact = null;
 
     const snap = isLeadSearch ? await this.domService.searchWebLeads(message) : await this.domService.inspectUrl(targetUrl);
+    const sanitizedDom = this.cliRouter?.guardrails
+      ? this.cliRouter.guardrails.sanitizeText(snap.textSnippet || "", snap.url)
+      : { cleanText: snap.textSnippet || "", redactionCount: 0, matchedRules: [] };
+    const safeDomSnippet = sanitizedDom.cleanText;
+
     const extractedUrls = snap.extractedUrls?.length ? snap.extractedUrls : [snap.url];
     if (snap.searchQueries?.length) {
       toolCalls.push({
@@ -34,19 +40,25 @@ export class CompanionChatOrchestrator {
       tool: "web_extract",
       status: "complete",
       input: { urls: extractedUrls },
-      output: `Title: "${snap.title}" · ${snap.headings.length} headings · ${snap.interactiveElements.length} [data-oi-id] interactive nodes`,
+      output: `Title: "${snap.title}" · ${snap.headings.length} headings · ${snap.interactiveElements.length} [data-oi-id] nodes · Guardrails: ${sanitizedDom.redactionCount} redacted`,
       oiToolMetadata: { websites: extractedUrls.map((u) => ({ url: u })) }
     });
+
+    const bm25Hits = this.wikiFts ? this.wikiFts.search(message, 2) : { results: [] };
+    const progSkills = this.cliRouter?.skillCatalog
+      ? this.cliRouter.skillCatalog.buildProgressiveContext({ companionSkills: companion.skills, prompt: message })
+      : { xmlCatalog: "", activatedSkills: [], tokenSavingsPct: 0 };
 
     let cliRun = null;
     if (this.cliRouter) {
       const effectiveHarness = harnessId || this.cliRouter.activeHarnessId;
-      const resolved = this.cliRouter.resolveForCompanion(companion.id, effectiveHarness);
+      const resolved = this.cliRouter.resolveForCompanion(companion.id, effectiveHarness, message);
       const skillPaths = this.cliRouter.resolveSkillFiles(companion.skills);
-      const shouldExecLive = Boolean(liveCli) || resolved.resolvedHarness === "grok";
-      const urlCtx = explicitUrl || isLeadSearch ? `\nDữ liệu lead/web thực tế vừa trích xuất ("${snap.title}"):\n${snap.textSnippet.slice(0, 750)}` : "";
+      const shouldExecLive = Boolean(liveCli) || resolved.id === "grok";
+      const urlCtx = explicitUrl || isLeadSearch ? `\nDữ liệu lead/web thực tế vừa trích xuất ("${snap.title}"):\n${safeDomSnippet.slice(0, 750)}` : "";
+      const wikiCtx = bm25Hits.results?.length ? `\nBộ nhớ BM25 (${bm25Hits.results.map((r) => r.path).join(", ")}):\n${bm25Hits.results.map((r) => r.snippet).join(" | ").slice(0, 240)}` : "";
       const leadRule = isLeadSearch ? "\nÁp dụng chuẩn find-prospects & qualify-account: trình bày danh sách các khách hàng thực tế ở trên kèm link Markdown [Tên](URL), Tín hiệu mua hàng (Buying Signal), phân loại Route (Priority / Explore / Nurture) và bước tiếp cận tiếp theo." : "";
-      const groundedPrompt = `[Không gọi tool read_file, trả lời trực tiếp ngay] Bạn là ${companion.name} (${companion.role}) trong Ổi Browser.${urlCtx}${leadRule}\nTrả lời bằng tiếng Việt (ngắn gọn, thực chiến, đúng chuyên môn, tuyệt đối không dùng emoji) cho yêu cầu: ${message}`;
+      const groundedPrompt = `[Không gọi tool read_file, trả lời trực tiếp ngay] Bạn là ${companion.name} (${companion.role}) trong Ổi Browser.\n${progSkills.xmlCatalog}${urlCtx}${wikiCtx}${leadRule}\nTrả lời bằng tiếng Việt (ngắn gọn, thực chiến, đúng chuyên môn, tuyệt đối không dùng emoji) cho yêu cầu: ${message}`;
       cliRun = await this.cliRouter.executeCommand({
         harnessId: effectiveHarness,
         companionId: companion.id,
@@ -57,78 +69,54 @@ export class CompanionChatOrchestrator {
       toolCalls.push({
         tool: "cli_harness_dispatch",
         status: "done",
-        input: { harness: resolved.resolvedHarness, binary: resolved.binaryPath || "local", skills: skillPaths },
-        output: `${resolved.label} · ${cliRun.durationMs}ms`
+        input: { harness: cliRun.resolvedHarness, binary: resolved.binaryPath || "local", skills: skillPaths, cascade: cliRun.cascadeChain, activatedSkills: progSkills.activatedSkills },
+        output: `${resolved.label} · ${cliRun.durationMs}ms · Skills XML (-${progSkills.tokenSavingsPct}% tokens)`
       });
     }
 
     const lower = String(message || "").toLowerCase();
     const wantsSheet =
-      isLeadSearch ||
-      lower.includes("sheet") ||
-      lower.includes("table") ||
-      lower.includes("bảng") ||
-      lower.includes("matrix") ||
-      lower.includes("csv") ||
-      lower.includes("extract") ||
-      companion.id === "research-rosa" ||
-      companion.id === "developer-dana";
+      isLeadSearch || lower.includes("sheet") || lower.includes("table") || lower.includes("bảng") ||
+      lower.includes("matrix") || lower.includes("csv") || lower.includes("extract") ||
+      companion.id === "research-rosa" || companion.id === "developer-dana";
 
     if (wantsSheet) {
       const rows = (snap.tables || []).slice(0, 12).map((cells, i) => ({
-        ID: cells[0] || `oi-${i + 1}`,
-        Type: cells[1] || "ELEMENT",
-        Content: cells[2] || cells[0] || "Item",
-        Reference: cells[3] || snap.url
+        ID: cells[0] || `oi-${i + 1}`, Type: cells[1] || "ELEMENT", Content: cells[2] || cells[0] || "Item", Reference: cells[3] || snap.url
       }));
       createdArtifact = this.store.createArtifact({
         title: `${companion.name}: Extracted Data — ${snap.title.slice(0, 42)}`,
-        kind: "spreadsheet",
-        companionId: companion.id,
-        sourceUrl: snap.url,
+        kind: "spreadsheet", companionId: companion.id, sourceUrl: snap.url,
         columns: ["ID", "Type", "Content", "Reference"],
-        rows:
-          rows.length > 0
-            ? rows
-            : [
-                { ID: "oi-1", Type: "PAGE_TITLE", Content: snap.title, Reference: snap.url },
-                { ID: "oi-2", Type: "META_DESC", Content: snap.description || "N/A", Reference: snap.url }
-              ]
+        rows: rows.length > 0 ? rows : [
+          { ID: "oi-1", Type: "PAGE_TITLE", Content: snap.title, Reference: snap.url },
+          { ID: "oi-2", Type: "META_DESC", Content: snap.description || "N/A", Reference: snap.url }
+        ]
       });
       toolCalls.push({
-        tool: "create_visual_artifact",
-        status: "done",
+        tool: "create_visual_artifact", status: "done",
         input: { kind: "spreadsheet", title: createdArtifact.title },
         output: `Created Spreadsheet Artifact (${createdArtifact.rows.length} rows)`
       });
     } else {
       const mdDoc = [
-        `# ${companion.name} (${companion.role}) — Deliverable`,
-        "",
+        `# ${companion.name} (${companion.role}) — Deliverable`, "",
         `- **Inspected Target**: [${snap.title}](${snap.url})`,
-        `- **Summary**: ${snap.description || snap.textSnippet.slice(0, 220)}`,
-        "",
+        `- **Summary**: ${snap.description || safeDomSnippet.slice(0, 220)}`, "",
         "## Observed DOM Structure (`data-oi-id`)",
-        ...(snap.headings.slice(0, 6).map((h) => `- ${h}`) || ["- Root document inspected"]),
-        "",
+        ...(snap.headings.slice(0, 6).map((h) => `- ${h}`) || ["- Root document inspected"]), "",
         "## Interactive Elements & Actionable Signals",
-        ...snap.interactiveElements.slice(0, 8).map((el) => `- \`[${el.oiId}]\` <${el.tag}> **${el.label}** ${el.href ? `→ ${el.href}` : ""}`),
-        "",
+        ...snap.interactiveElements.slice(0, 8).map((el) => `- \`[${el.oiId}]\` <${el.tag}> **${el.label}** ${el.href ? `-> ${el.href}` : ""}`), "",
         "## Recommended Next Actions",
         `1. **${companion.skills[0] || "verify"}**: Execute grounded workflow on ${snap.title}.`,
         `2. **${companion.skills[1] || "compile"}**: Sync key entities into \`entities/companies/\` in Karpathy-Wiki Memory.`
       ].join("\n");
-
       createdArtifact = this.store.createArtifact({
         title: `${companion.name} Brief: ${snap.title.slice(0, 45)}`,
-        kind: "document",
-        companionId: companion.id,
-        sourceUrl: snap.url,
-        contentMarkdown: mdDoc
+        kind: "document", companionId: companion.id, sourceUrl: snap.url, contentMarkdown: mdDoc
       });
       toolCalls.push({
-        tool: "create_visual_artifact",
-        status: "done",
+        tool: "create_visual_artifact", status: "done",
         input: { kind: "document", title: createdArtifact.title },
         output: `Created Document Artifact #${createdArtifact.id}`
       });
@@ -139,11 +127,12 @@ export class CompanionChatOrchestrator {
       summary: `Processed "${message.slice(0, 80)}" via ${cliRun?.resolvedHarness || "local"} on "${snap.title}" -> Artifact "${createdArtifact.title}"`,
       sourceUrl: snap.url
     });
+    this.wikiFts?.indexDocument({ path: obsPath, title: obsPath, category: "observations", content: this.memory.readFile(obsPath) });
+
     const targetFile = isLeadSearch ? "knowledge/crm.md" : obsPath;
     toolCalls.push({
-      tool: "file_write",
-      status: "complete",
-      input: { path: targetFile, content: snap.textSnippet },
+      tool: "file_write", status: "complete",
+      input: { path: targetFile, content: safeDomSnippet },
       output: `Appended dated observation to ${targetFile}`,
       oiToolMetadata: { action: "updated", lineDelta: { added: Math.max(3, (snap.tables || []).length) } }
     });
@@ -151,36 +140,30 @@ export class CompanionChatOrchestrator {
     if (snap.url.startsWith("http")) {
       const host = new URL(snap.url).hostname.replace(/^www\./, "");
       const entityPath = this.memory.upsertEntity({
-        type: "companies",
-        slug: host.replace(/\./g, "-"),
-        title: snap.title || host,
+        type: "companies", slug: host.replace(/\./g, "-"), title: snap.title || host,
         markdownBody: [
-          `- **URL**: ${snap.url}`,
-          `- **Inspected By**: ${companion.name} (\`${companion.id}\`)`,
+          `- **URL**: ${snap.url}`, `- **Inspected By**: ${companion.name} (\`${companion.id}\`)`,
           `- **CLI Harness**: \`${cliRun?.resolvedHarness || "local"}\``,
           `- **Description**: ${snap.description || "Extracted via AgentDOMBrowserService"}`,
           `- **Top Headings**: ${snap.headings.slice(0, 5).join(" | ") || "N/A"}`
         ].join("\n")
       });
+      this.wikiFts?.indexDocument({ path: entityPath, title: snap.title || host, category: "entities", content: this.memory.readFile(entityPath) });
     }
 
     const isSimulated = /^\[[^\]]+\] (Executed grounded turn|Streamed prompt|Completed)/.test(cliRun?.stdout || "");
     const rawLiveOut = cliRun?.stdout && !isSimulated ? cliRun.stdout.trim() : "";
     const cleanLiveOut = rawLiveOut.replace(/[\p{Extended_Pictographic}\uFE0F]/gu, "").replace(/  +/g, " ").trim();
     const fallbackOut = isLeadSearch
-      ? `Đã hoàn tất tìm kiếm và phân loại khách hàng tiềm năng (**find-prospects** & **qualify-account**) đồng thời cập nhật \`knowledge/crm.md\`:\n\n${snap.textSnippet}`
-      : snap.description ? `> ${snap.description}` : `> ${snap.textSnippet.slice(0, 200)}...`;
+      ? `Đã hoàn tất tìm kiếm và phân loại khách hàng tiềm năng (**find-prospects** & **qualify-account**) đồng thời cập nhật \`knowledge/crm.md\`:\n\n${safeDomSnippet}`
+      : snap.description ? `> ${snap.description}` : `> ${safeDomSnippet.slice(0, 200)}...`;
     const reply = cleanLiveOut || fallbackOut;
 
     const assistantMsg = this.store.addMessage({
-      companionId: companion.id,
-      sender: "assistant",
-      content: reply,
-      toolCalls,
-      artifactId: createdArtifact.id
+      companionId: companion.id, sender: "assistant", content: reply, toolCalls, artifactId: createdArtifact.id
     });
 
-    return { assistantMessage: assistantMsg, artifact: createdArtifact, snapshot: snap, cliRun };
+    return { assistantMessage: assistantMsg, artifact: createdArtifact, snapshot: snap, cliRun, bm25Hits };
   }
 
   extractUrlFromText(text) {
