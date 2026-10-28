@@ -11,11 +11,14 @@
     <style>
       @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}}
       /* Right-Hand-Side Navigation Sidebar Layout */
-      .home-sidebar-layout {
+      .home-sidebar-layout,
+      div:has(> .settings-sidebar-shell) {
         flex-direction: row-reverse !important;
       }
-      .home-sidebar-layout > .svelte-1kzbkf6 {
+      .home-sidebar-layout > .svelte-1kzbkf6,
+      .settings-sidebar-shell {
         border-left: 1px solid oklch(var(--border) / 0.65);
+        border-right: none !important;
       }
       .home-sidebar-layout > .svelte-1kzbkf6 .right-0.w-\[0\.5px\] {
         right: auto !important;

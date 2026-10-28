@@ -175,5 +175,11 @@ export function resolveTopicState(topic, key, bridge) {
   if (topic === "onboarding.checklist") return { status: "absent", eligible: false, visible: false, finished: true, record: null };
   if (topic === "profile.team") return { team: null, invite: null };
   if (topic === "profile.usage") return { creditsRemaining: 5000, creditsLimit: 5000, plan: "pro" };
+  if (topic === "settings.chatgptPlan") {
+    return {
+      status: { kind: "ready", status: { signIn: { kind: "available" }, usageEnabled: true, connections: [{ id: "conn-cli-core", email: "local@oibrowser.vn · CLI Core (5/5 Ready)", status: "active", selected: true }] } },
+      firstUseNoticePending: false
+    };
+  }
   return {};
 }

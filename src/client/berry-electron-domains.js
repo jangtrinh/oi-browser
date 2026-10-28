@@ -34,6 +34,9 @@ export function handleDomainInvoke(eventName, payload = {}, bridge) {
   const state = bridge.serverState || {};
   if (eventName === "feature-flags:get-effective") return { flags: FEATURE_FLAGS };
   if (eventName === "settings:get" && payload.key === "feature-flags") return { value: FEATURE_FLAGS };
+  if (eventName === "account:list-social-connections") {
+    return { success: true, connections: [{ id: "soc-google-1", provider: "google", email: "local@oibrowser.vn", name: "Ổi Workspace Local", createdAt: "2026-10-01T00:00:00Z" }] };
+  }
   if (eventName === "account:get") {
     return {
       currentPlan: "pro", currentPriceId: "price_oi_pro", currentBillingInterval: "month", currentPlanTerms: null,
