@@ -1,0 +1,151 @@
+{
+  "kind": "evolution-proof",
+  "version": 1,
+  "projectId": "oi-browser",
+  "sources": [
+    {
+      "id": "src-right-sidebar-differentiation",
+      "projectId": "oi-browser",
+      "learnedAt": "2026-10-27T15:00:00Z",
+      "evidenceRef": "public/index.html",
+      "lesson": "Move the 290px Navigation Sidebar to the Right-Hand Side via .home-sidebar-layout { flex-direction: row-reverse !important; } while keeping all SvelteKit 5 routes and popovers intact."
+    },
+    {
+      "id": "src-cli-dock-balance",
+      "projectId": "oi-browser",
+      "learnedAt": "2026-10-27T15:05:00Z",
+      "evidenceRef": "src/client/berry-cli-terminal-dock.js",
+      "lesson": "Anchor #oi-cli-dock-root (CLI Core: AUTO 5/5) at bottom-left (left: 20px; bottom: 20px) so it never collides with the local@oibrowser.vn footer in the Right-Hand Sidebar."
+    },
+    {
+      "id": "src-3d-vietnamese-fruit-identity",
+      "projectId": "oi-browser",
+      "learnedAt": "2026-10-27T15:10:00Z",
+      "evidenceRef": "src/server/official-companions-catalog.js",
+      "lesson": "Represent all 9 companions with 3D Vietnamese fruit PNGs (Ổi, Măng Cụt, Sầu Riêng, Thanh Long, Bưởi, Vú Sữa, Xoài, Chôm Chôm, Vải) and zero emoji glyphs."
+    },
+    {
+      "id": "src-3-tier-token-ontology",
+      "projectId": "oi-browser",
+      "learnedAt": "2026-10-28T00:25:00Z",
+      "evidenceRef": "design/ontology.tokens.json",
+      "lesson": "Enforce 3-tier DTCG token hierarchy (primitive-* -> semantic-* -> composite-*) with >= 4.5:1 AA contrast across all 15 text x surface pairs."
+    }
+  ],
+  "applications": [
+    {
+      "id": "app-right-sidebar-shell",
+      "sourceIds": [
+        "src-right-sidebar-differentiation",
+        "src-cli-dock-balance"
+      ],
+      "appliedAt": "2026-10-27T15:15:00Z",
+      "relevance": "Applies Layout/RightHandSidebarShell and Overlay/CliHarnessDock across all 11 screens.",
+      "decisionRef": "design/soul.md",
+      "artifactRef": "public/index.html",
+      "outcomeRef": "design/component-registry.json"
+    },
+    {
+      "id": "app-3d-fruit-use-cases",
+      "sourceIds": [
+        "src-3d-vietnamese-fruit-identity"
+      ],
+      "appliedAt": "2026-10-27T15:20:00Z",
+      "relevance": "Applies Avatar/FruitCompanion and Content/UseCaseStarterBook across Plaza, Recent Chats, and /use-cases.",
+      "decisionRef": "design/soul.md",
+      "artifactRef": "public/_app/immutable/nodes/116.jmviVD4E.js",
+      "outcomeRef": "design/component-registry.json"
+    },
+    {
+      "id": "app-work-trace-accordion",
+      "sourceIds": [
+        "src-3-tier-token-ontology"
+      ],
+      "appliedAt": "2026-10-28T00:28:00Z",
+      "relevance": "Maps tool calls (use_search_engine, web_extract, cli_harness_dispatch, file_write) to Content/WorkTraceAccordion with Badge/StatusCount.",
+      "decisionRef": "design/soul.md",
+      "artifactRef": "src/client/berry-electron-state.js",
+      "outcomeRef": "design/design.tokens.json"
+    }
+  ],
+  "defects": [
+    {
+      "id": "def-cli-dock-right-overlap",
+      "sourceId": "src-cli-dock-balance",
+      "escapedAt": "2026-10-27T15:06:00Z",
+      "correctedAt": "2026-10-27T15:18:00Z",
+      "rootCause": "When the sidebar moved to the right-hand side, the CLI dock at right: 16px overlapped local@oibrowser.vn.",
+      "gateId": "right-sidebar-dock-separation",
+      "gateRef": "test/berry-browser.test.js",
+      "negativeFixtureRef": "src/client/berry-cli-terminal-dock.js",
+      "fixtureFails": true,
+      "laterRunRef": "design/heartbeat-state.json",
+      "laterDetectedCount": 0
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "cmp-right-sidebar-layout",
+      "category": "workspace-shell",
+      "controlledInputs": true,
+      "blindEvaluation": true,
+      "control": {
+        "artifactRef": "public/index.html",
+        "curatorScore": 68,
+        "repairRounds": 2,
+        "repeatedCorrections": 2
+      },
+      "treatment": {
+        "artifactRef": "public/index.html",
+        "curatorScore": 96,
+        "repairRounds": 1,
+        "repeatedCorrections": 0
+      },
+      "regressions": 0
+    },
+    {
+      "id": "cmp-work-trace-chat",
+      "category": "companion-chat",
+      "controlledInputs": true,
+      "blindEvaluation": true,
+      "control": {
+        "artifactRef": "src/client/berry-electron-state.js",
+        "curatorScore": 62,
+        "repairRounds": 2,
+        "repeatedCorrections": 2
+      },
+      "treatment": {
+        "artifactRef": "src/client/berry-electron-state.js",
+        "curatorScore": 95,
+        "repairRounds": 1,
+        "repeatedCorrections": 0
+      },
+      "regressions": 0
+    },
+    {
+      "id": "cmp-use-cases-fruit-deck",
+      "category": "use-cases-gallery",
+      "controlledInputs": true,
+      "blindEvaluation": true,
+      "control": {
+        "artifactRef": "public/_app/immutable/nodes/116.jmviVD4E.js",
+        "curatorScore": 60,
+        "repairRounds": 2,
+        "repeatedCorrections": 2
+      },
+      "treatment": {
+        "artifactRef": "public/_app/immutable/nodes/116.jmviVD4E.js",
+        "curatorScore": 96,
+        "repairRounds": 1,
+        "repeatedCorrections": 0
+      },
+      "regressions": 0
+    }
+  ],
+  "safeguards": {
+    "contradictionPassed": true,
+    "contradictionRef": "design/soul.md",
+    "isolationPassed": true,
+    "isolationRef": "src/client/berry-cli-terminal-dock.js"
+  }
+}

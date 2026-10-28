@@ -1,0 +1,753 @@
+{
+  "name": "oi-browser-ia-flow",
+  "entryPoints": [
+    {
+      "id": "entry-plaza",
+      "screen": "plaza-newtab",
+      "name": "Default Browser Launch (/newtab Plaza)"
+    },
+    {
+      "id": "entry-chat",
+      "screen": "chat-session",
+      "name": "Direct Companion Session Link (/chat/:sessionId)"
+    }
+  ],
+  "screens": [
+    {
+      "id": "plaza-newtab",
+      "name": "Plaza — 3D Fruit Companion Stage & Prompt Composer (/newtab)",
+      "mode": "screen",
+      "artifact": "public/index.html",
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "id": "chat-session",
+      "name": "Chat Session — Companion Thread & Work-Trace Accordion (/chat/:id)",
+      "mode": "screen",
+      "artifact": "src/client/berry-electron-state.js",
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "id": "routines-hub",
+      "name": "Routines — Scheduled Autonomous Cron Workflows (/routines)",
+      "mode": "screen",
+      "artifact": "src/client/berry-electron-state.js",
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "id": "connected-apps",
+      "name": "Apps — Local & MCP Connector Directory (/apps)",
+      "mode": "screen",
+      "artifact": "src/client/berry-electron-domains.js",
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "id": "skills-directory",
+      "name": "Skills — 31 Official Companion Skill Bundles (/skills)",
+      "mode": "screen",
+      "artifact": "src/client/berry-electron-state.js",
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "id": "agent-databases",
+      "name": "Databases — SQLite & Karpathy-Wiki Structured Tables (/databases)",
+      "mode": "screen",
+      "artifact": "src/client/berry-electron-domains.js",
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "id": "activity-timeline",
+      "name": "Timeline — Chronological Tool & Observation Feed (/timeline)",
+      "mode": "screen",
+      "artifact": "src/client/berry-electron-domains.js",
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "id": "meetings-notes",
+      "name": "Meetings — Transcripts & Action Item Extraction (/meetings)",
+      "mode": "screen",
+      "artifact": "src/client/berry-electron-domains.js",
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "id": "artifacts-library",
+      "name": "Library — Visual Artifacts, Spreadsheets & SyncedFS (/library)",
+      "mode": "screen",
+      "artifact": "src/client/berry-electron-state.js",
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "id": "use-cases-gallery",
+      "name": "Use Cases — 3D Fruit Starter Kits & Prompt Decks (/use-cases)",
+      "mode": "screen",
+      "artifact": "public/_app/immutable/nodes/116.jmviVD4E.js",
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "id": "cli-terminal-drawer",
+      "name": "CLI Harness Dock — Bottom-Left Multi-CLI Terminal Drawer (#oi-cli-dock-root)",
+      "mode": "screen",
+      "artifact": "src/client/berry-cli-terminal-dock.js",
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ]
+    }
+  ],
+  "transitions": [
+    {
+      "id": "tr-plaza-newtab-load",
+      "from": "plaza-newtab.default",
+      "to": "plaza-newtab.loading",
+      "trigger": "ON_CLICK",
+      "label": "Refresh plaza-newtab"
+    },
+    {
+      "id": "tr-plaza-newtab-loaded",
+      "from": "plaza-newtab.loading",
+      "to": "plaza-newtab.default",
+      "trigger": "AFTER_DELAY",
+      "label": "plaza-newtab loaded with data"
+    },
+    {
+      "id": "tr-plaza-newtab-empty",
+      "from": "plaza-newtab.loading",
+      "to": "plaza-newtab.empty",
+      "trigger": "AFTER_DELAY",
+      "label": "plaza-newtab loaded empty"
+    },
+    {
+      "id": "tr-plaza-newtab-error",
+      "from": "plaza-newtab.loading",
+      "to": "plaza-newtab.error",
+      "trigger": "AFTER_DELAY",
+      "label": "plaza-newtab failed to load"
+    },
+    {
+      "id": "tr-plaza-newtab-retry",
+      "from": "plaza-newtab.error",
+      "to": "plaza-newtab.loading",
+      "trigger": "ON_CLICK",
+      "label": "Retry loading plaza-newtab"
+    },
+    {
+      "id": "tr-plaza-newtab-seed",
+      "from": "plaza-newtab.empty",
+      "to": "plaza-newtab.default",
+      "trigger": "ON_CLICK",
+      "label": "Create first item in plaza-newtab"
+    },
+    {
+      "id": "tr-plaza-to-chat-session",
+      "from": "plaza-newtab",
+      "to": "chat-session",
+      "trigger": "ON_CLICK",
+      "label": "Navigate to chat-session via Right-Hand Sidebar or quick action"
+    },
+    {
+      "id": "tr-chat-session-to-plaza",
+      "from": "chat-session",
+      "to": "plaza-newtab",
+      "trigger": "ON_CLICK",
+      "label": "Return to Plaza (/newtab) via New Chat in Right-Hand Sidebar"
+    },
+    {
+      "id": "tr-chat-session-load",
+      "from": "chat-session.default",
+      "to": "chat-session.loading",
+      "trigger": "ON_CLICK",
+      "label": "Refresh chat-session"
+    },
+    {
+      "id": "tr-chat-session-loaded",
+      "from": "chat-session.loading",
+      "to": "chat-session.default",
+      "trigger": "AFTER_DELAY",
+      "label": "chat-session loaded with data"
+    },
+    {
+      "id": "tr-chat-session-empty",
+      "from": "chat-session.loading",
+      "to": "chat-session.empty",
+      "trigger": "AFTER_DELAY",
+      "label": "chat-session loaded empty"
+    },
+    {
+      "id": "tr-chat-session-error",
+      "from": "chat-session.loading",
+      "to": "chat-session.error",
+      "trigger": "AFTER_DELAY",
+      "label": "chat-session failed to load"
+    },
+    {
+      "id": "tr-chat-session-retry",
+      "from": "chat-session.error",
+      "to": "chat-session.loading",
+      "trigger": "ON_CLICK",
+      "label": "Retry loading chat-session"
+    },
+    {
+      "id": "tr-chat-session-seed",
+      "from": "chat-session.empty",
+      "to": "chat-session.default",
+      "trigger": "ON_CLICK",
+      "label": "Create first item in chat-session"
+    },
+    {
+      "id": "tr-plaza-to-routines-hub",
+      "from": "plaza-newtab",
+      "to": "routines-hub",
+      "trigger": "ON_CLICK",
+      "label": "Navigate to routines-hub via Right-Hand Sidebar or quick action"
+    },
+    {
+      "id": "tr-routines-hub-to-plaza",
+      "from": "routines-hub",
+      "to": "plaza-newtab",
+      "trigger": "ON_CLICK",
+      "label": "Return to Plaza (/newtab) via New Chat in Right-Hand Sidebar"
+    },
+    {
+      "id": "tr-routines-hub-load",
+      "from": "routines-hub.default",
+      "to": "routines-hub.loading",
+      "trigger": "ON_CLICK",
+      "label": "Refresh routines-hub"
+    },
+    {
+      "id": "tr-routines-hub-loaded",
+      "from": "routines-hub.loading",
+      "to": "routines-hub.default",
+      "trigger": "AFTER_DELAY",
+      "label": "routines-hub loaded with data"
+    },
+    {
+      "id": "tr-routines-hub-empty",
+      "from": "routines-hub.loading",
+      "to": "routines-hub.empty",
+      "trigger": "AFTER_DELAY",
+      "label": "routines-hub loaded empty"
+    },
+    {
+      "id": "tr-routines-hub-error",
+      "from": "routines-hub.loading",
+      "to": "routines-hub.error",
+      "trigger": "AFTER_DELAY",
+      "label": "routines-hub failed to load"
+    },
+    {
+      "id": "tr-routines-hub-retry",
+      "from": "routines-hub.error",
+      "to": "routines-hub.loading",
+      "trigger": "ON_CLICK",
+      "label": "Retry loading routines-hub"
+    },
+    {
+      "id": "tr-routines-hub-seed",
+      "from": "routines-hub.empty",
+      "to": "routines-hub.default",
+      "trigger": "ON_CLICK",
+      "label": "Create first item in routines-hub"
+    },
+    {
+      "id": "tr-plaza-to-connected-apps",
+      "from": "plaza-newtab",
+      "to": "connected-apps",
+      "trigger": "ON_CLICK",
+      "label": "Navigate to connected-apps via Right-Hand Sidebar or quick action"
+    },
+    {
+      "id": "tr-connected-apps-to-plaza",
+      "from": "connected-apps",
+      "to": "plaza-newtab",
+      "trigger": "ON_CLICK",
+      "label": "Return to Plaza (/newtab) via New Chat in Right-Hand Sidebar"
+    },
+    {
+      "id": "tr-connected-apps-load",
+      "from": "connected-apps.default",
+      "to": "connected-apps.loading",
+      "trigger": "ON_CLICK",
+      "label": "Refresh connected-apps"
+    },
+    {
+      "id": "tr-connected-apps-loaded",
+      "from": "connected-apps.loading",
+      "to": "connected-apps.default",
+      "trigger": "AFTER_DELAY",
+      "label": "connected-apps loaded with data"
+    },
+    {
+      "id": "tr-connected-apps-empty",
+      "from": "connected-apps.loading",
+      "to": "connected-apps.empty",
+      "trigger": "AFTER_DELAY",
+      "label": "connected-apps loaded empty"
+    },
+    {
+      "id": "tr-connected-apps-error",
+      "from": "connected-apps.loading",
+      "to": "connected-apps.error",
+      "trigger": "AFTER_DELAY",
+      "label": "connected-apps failed to load"
+    },
+    {
+      "id": "tr-connected-apps-retry",
+      "from": "connected-apps.error",
+      "to": "connected-apps.loading",
+      "trigger": "ON_CLICK",
+      "label": "Retry loading connected-apps"
+    },
+    {
+      "id": "tr-connected-apps-seed",
+      "from": "connected-apps.empty",
+      "to": "connected-apps.default",
+      "trigger": "ON_CLICK",
+      "label": "Create first item in connected-apps"
+    },
+    {
+      "id": "tr-plaza-to-skills-directory",
+      "from": "plaza-newtab",
+      "to": "skills-directory",
+      "trigger": "ON_CLICK",
+      "label": "Navigate to skills-directory via Right-Hand Sidebar or quick action"
+    },
+    {
+      "id": "tr-skills-directory-to-plaza",
+      "from": "skills-directory",
+      "to": "plaza-newtab",
+      "trigger": "ON_CLICK",
+      "label": "Return to Plaza (/newtab) via New Chat in Right-Hand Sidebar"
+    },
+    {
+      "id": "tr-skills-directory-load",
+      "from": "skills-directory.default",
+      "to": "skills-directory.loading",
+      "trigger": "ON_CLICK",
+      "label": "Refresh skills-directory"
+    },
+    {
+      "id": "tr-skills-directory-loaded",
+      "from": "skills-directory.loading",
+      "to": "skills-directory.default",
+      "trigger": "AFTER_DELAY",
+      "label": "skills-directory loaded with data"
+    },
+    {
+      "id": "tr-skills-directory-empty",
+      "from": "skills-directory.loading",
+      "to": "skills-directory.empty",
+      "trigger": "AFTER_DELAY",
+      "label": "skills-directory loaded empty"
+    },
+    {
+      "id": "tr-skills-directory-error",
+      "from": "skills-directory.loading",
+      "to": "skills-directory.error",
+      "trigger": "AFTER_DELAY",
+      "label": "skills-directory failed to load"
+    },
+    {
+      "id": "tr-skills-directory-retry",
+      "from": "skills-directory.error",
+      "to": "skills-directory.loading",
+      "trigger": "ON_CLICK",
+      "label": "Retry loading skills-directory"
+    },
+    {
+      "id": "tr-skills-directory-seed",
+      "from": "skills-directory.empty",
+      "to": "skills-directory.default",
+      "trigger": "ON_CLICK",
+      "label": "Create first item in skills-directory"
+    },
+    {
+      "id": "tr-plaza-to-agent-databases",
+      "from": "plaza-newtab",
+      "to": "agent-databases",
+      "trigger": "ON_CLICK",
+      "label": "Navigate to agent-databases via Right-Hand Sidebar or quick action"
+    },
+    {
+      "id": "tr-agent-databases-to-plaza",
+      "from": "agent-databases",
+      "to": "plaza-newtab",
+      "trigger": "ON_CLICK",
+      "label": "Return to Plaza (/newtab) via New Chat in Right-Hand Sidebar"
+    },
+    {
+      "id": "tr-agent-databases-load",
+      "from": "agent-databases.default",
+      "to": "agent-databases.loading",
+      "trigger": "ON_CLICK",
+      "label": "Refresh agent-databases"
+    },
+    {
+      "id": "tr-agent-databases-loaded",
+      "from": "agent-databases.loading",
+      "to": "agent-databases.default",
+      "trigger": "AFTER_DELAY",
+      "label": "agent-databases loaded with data"
+    },
+    {
+      "id": "tr-agent-databases-empty",
+      "from": "agent-databases.loading",
+      "to": "agent-databases.empty",
+      "trigger": "AFTER_DELAY",
+      "label": "agent-databases loaded empty"
+    },
+    {
+      "id": "tr-agent-databases-error",
+      "from": "agent-databases.loading",
+      "to": "agent-databases.error",
+      "trigger": "AFTER_DELAY",
+      "label": "agent-databases failed to load"
+    },
+    {
+      "id": "tr-agent-databases-retry",
+      "from": "agent-databases.error",
+      "to": "agent-databases.loading",
+      "trigger": "ON_CLICK",
+      "label": "Retry loading agent-databases"
+    },
+    {
+      "id": "tr-agent-databases-seed",
+      "from": "agent-databases.empty",
+      "to": "agent-databases.default",
+      "trigger": "ON_CLICK",
+      "label": "Create first item in agent-databases"
+    },
+    {
+      "id": "tr-plaza-to-activity-timeline",
+      "from": "plaza-newtab",
+      "to": "activity-timeline",
+      "trigger": "ON_CLICK",
+      "label": "Navigate to activity-timeline via Right-Hand Sidebar or quick action"
+    },
+    {
+      "id": "tr-activity-timeline-to-plaza",
+      "from": "activity-timeline",
+      "to": "plaza-newtab",
+      "trigger": "ON_CLICK",
+      "label": "Return to Plaza (/newtab) via New Chat in Right-Hand Sidebar"
+    },
+    {
+      "id": "tr-activity-timeline-load",
+      "from": "activity-timeline.default",
+      "to": "activity-timeline.loading",
+      "trigger": "ON_CLICK",
+      "label": "Refresh activity-timeline"
+    },
+    {
+      "id": "tr-activity-timeline-loaded",
+      "from": "activity-timeline.loading",
+      "to": "activity-timeline.default",
+      "trigger": "AFTER_DELAY",
+      "label": "activity-timeline loaded with data"
+    },
+    {
+      "id": "tr-activity-timeline-empty",
+      "from": "activity-timeline.loading",
+      "to": "activity-timeline.empty",
+      "trigger": "AFTER_DELAY",
+      "label": "activity-timeline loaded empty"
+    },
+    {
+      "id": "tr-activity-timeline-error",
+      "from": "activity-timeline.loading",
+      "to": "activity-timeline.error",
+      "trigger": "AFTER_DELAY",
+      "label": "activity-timeline failed to load"
+    },
+    {
+      "id": "tr-activity-timeline-retry",
+      "from": "activity-timeline.error",
+      "to": "activity-timeline.loading",
+      "trigger": "ON_CLICK",
+      "label": "Retry loading activity-timeline"
+    },
+    {
+      "id": "tr-activity-timeline-seed",
+      "from": "activity-timeline.empty",
+      "to": "activity-timeline.default",
+      "trigger": "ON_CLICK",
+      "label": "Create first item in activity-timeline"
+    },
+    {
+      "id": "tr-plaza-to-meetings-notes",
+      "from": "plaza-newtab",
+      "to": "meetings-notes",
+      "trigger": "ON_CLICK",
+      "label": "Navigate to meetings-notes via Right-Hand Sidebar or quick action"
+    },
+    {
+      "id": "tr-meetings-notes-to-plaza",
+      "from": "meetings-notes",
+      "to": "plaza-newtab",
+      "trigger": "ON_CLICK",
+      "label": "Return to Plaza (/newtab) via New Chat in Right-Hand Sidebar"
+    },
+    {
+      "id": "tr-meetings-notes-load",
+      "from": "meetings-notes.default",
+      "to": "meetings-notes.loading",
+      "trigger": "ON_CLICK",
+      "label": "Refresh meetings-notes"
+    },
+    {
+      "id": "tr-meetings-notes-loaded",
+      "from": "meetings-notes.loading",
+      "to": "meetings-notes.default",
+      "trigger": "AFTER_DELAY",
+      "label": "meetings-notes loaded with data"
+    },
+    {
+      "id": "tr-meetings-notes-empty",
+      "from": "meetings-notes.loading",
+      "to": "meetings-notes.empty",
+      "trigger": "AFTER_DELAY",
+      "label": "meetings-notes loaded empty"
+    },
+    {
+      "id": "tr-meetings-notes-error",
+      "from": "meetings-notes.loading",
+      "to": "meetings-notes.error",
+      "trigger": "AFTER_DELAY",
+      "label": "meetings-notes failed to load"
+    },
+    {
+      "id": "tr-meetings-notes-retry",
+      "from": "meetings-notes.error",
+      "to": "meetings-notes.loading",
+      "trigger": "ON_CLICK",
+      "label": "Retry loading meetings-notes"
+    },
+    {
+      "id": "tr-meetings-notes-seed",
+      "from": "meetings-notes.empty",
+      "to": "meetings-notes.default",
+      "trigger": "ON_CLICK",
+      "label": "Create first item in meetings-notes"
+    },
+    {
+      "id": "tr-plaza-to-artifacts-library",
+      "from": "plaza-newtab",
+      "to": "artifacts-library",
+      "trigger": "ON_CLICK",
+      "label": "Navigate to artifacts-library via Right-Hand Sidebar or quick action"
+    },
+    {
+      "id": "tr-artifacts-library-to-plaza",
+      "from": "artifacts-library",
+      "to": "plaza-newtab",
+      "trigger": "ON_CLICK",
+      "label": "Return to Plaza (/newtab) via New Chat in Right-Hand Sidebar"
+    },
+    {
+      "id": "tr-artifacts-library-load",
+      "from": "artifacts-library.default",
+      "to": "artifacts-library.loading",
+      "trigger": "ON_CLICK",
+      "label": "Refresh artifacts-library"
+    },
+    {
+      "id": "tr-artifacts-library-loaded",
+      "from": "artifacts-library.loading",
+      "to": "artifacts-library.default",
+      "trigger": "AFTER_DELAY",
+      "label": "artifacts-library loaded with data"
+    },
+    {
+      "id": "tr-artifacts-library-empty",
+      "from": "artifacts-library.loading",
+      "to": "artifacts-library.empty",
+      "trigger": "AFTER_DELAY",
+      "label": "artifacts-library loaded empty"
+    },
+    {
+      "id": "tr-artifacts-library-error",
+      "from": "artifacts-library.loading",
+      "to": "artifacts-library.error",
+      "trigger": "AFTER_DELAY",
+      "label": "artifacts-library failed to load"
+    },
+    {
+      "id": "tr-artifacts-library-retry",
+      "from": "artifacts-library.error",
+      "to": "artifacts-library.loading",
+      "trigger": "ON_CLICK",
+      "label": "Retry loading artifacts-library"
+    },
+    {
+      "id": "tr-artifacts-library-seed",
+      "from": "artifacts-library.empty",
+      "to": "artifacts-library.default",
+      "trigger": "ON_CLICK",
+      "label": "Create first item in artifacts-library"
+    },
+    {
+      "id": "tr-plaza-to-use-cases-gallery",
+      "from": "plaza-newtab",
+      "to": "use-cases-gallery",
+      "trigger": "ON_CLICK",
+      "label": "Navigate to use-cases-gallery via Right-Hand Sidebar or quick action"
+    },
+    {
+      "id": "tr-use-cases-gallery-to-plaza",
+      "from": "use-cases-gallery",
+      "to": "plaza-newtab",
+      "trigger": "ON_CLICK",
+      "label": "Return to Plaza (/newtab) via New Chat in Right-Hand Sidebar"
+    },
+    {
+      "id": "tr-use-cases-gallery-load",
+      "from": "use-cases-gallery.default",
+      "to": "use-cases-gallery.loading",
+      "trigger": "ON_CLICK",
+      "label": "Refresh use-cases-gallery"
+    },
+    {
+      "id": "tr-use-cases-gallery-loaded",
+      "from": "use-cases-gallery.loading",
+      "to": "use-cases-gallery.default",
+      "trigger": "AFTER_DELAY",
+      "label": "use-cases-gallery loaded with data"
+    },
+    {
+      "id": "tr-use-cases-gallery-empty",
+      "from": "use-cases-gallery.loading",
+      "to": "use-cases-gallery.empty",
+      "trigger": "AFTER_DELAY",
+      "label": "use-cases-gallery loaded empty"
+    },
+    {
+      "id": "tr-use-cases-gallery-error",
+      "from": "use-cases-gallery.loading",
+      "to": "use-cases-gallery.error",
+      "trigger": "AFTER_DELAY",
+      "label": "use-cases-gallery failed to load"
+    },
+    {
+      "id": "tr-use-cases-gallery-retry",
+      "from": "use-cases-gallery.error",
+      "to": "use-cases-gallery.loading",
+      "trigger": "ON_CLICK",
+      "label": "Retry loading use-cases-gallery"
+    },
+    {
+      "id": "tr-use-cases-gallery-seed",
+      "from": "use-cases-gallery.empty",
+      "to": "use-cases-gallery.default",
+      "trigger": "ON_CLICK",
+      "label": "Create first item in use-cases-gallery"
+    },
+    {
+      "id": "tr-plaza-to-cli-terminal-drawer",
+      "from": "plaza-newtab",
+      "to": "cli-terminal-drawer",
+      "trigger": "ON_CLICK",
+      "label": "Navigate to cli-terminal-drawer via Right-Hand Sidebar or quick action"
+    },
+    {
+      "id": "tr-cli-terminal-drawer-to-plaza",
+      "from": "cli-terminal-drawer",
+      "to": "plaza-newtab",
+      "trigger": "ON_CLICK",
+      "label": "Return to Plaza (/newtab) via New Chat in Right-Hand Sidebar"
+    },
+    {
+      "id": "tr-cli-terminal-drawer-load",
+      "from": "cli-terminal-drawer.default",
+      "to": "cli-terminal-drawer.loading",
+      "trigger": "ON_CLICK",
+      "label": "Refresh cli-terminal-drawer"
+    },
+    {
+      "id": "tr-cli-terminal-drawer-loaded",
+      "from": "cli-terminal-drawer.loading",
+      "to": "cli-terminal-drawer.default",
+      "trigger": "AFTER_DELAY",
+      "label": "cli-terminal-drawer loaded with data"
+    },
+    {
+      "id": "tr-cli-terminal-drawer-empty",
+      "from": "cli-terminal-drawer.loading",
+      "to": "cli-terminal-drawer.empty",
+      "trigger": "AFTER_DELAY",
+      "label": "cli-terminal-drawer loaded empty"
+    },
+    {
+      "id": "tr-cli-terminal-drawer-error",
+      "from": "cli-terminal-drawer.loading",
+      "to": "cli-terminal-drawer.error",
+      "trigger": "AFTER_DELAY",
+      "label": "cli-terminal-drawer failed to load"
+    },
+    {
+      "id": "tr-cli-terminal-drawer-retry",
+      "from": "cli-terminal-drawer.error",
+      "to": "cli-terminal-drawer.loading",
+      "trigger": "ON_CLICK",
+      "label": "Retry loading cli-terminal-drawer"
+    },
+    {
+      "id": "tr-cli-terminal-drawer-seed",
+      "from": "cli-terminal-drawer.empty",
+      "to": "cli-terminal-drawer.default",
+      "trigger": "ON_CLICK",
+      "label": "Create first item in cli-terminal-drawer"
+    }
+  ]
+}

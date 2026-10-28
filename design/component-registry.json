@@ -1,0 +1,684 @@
+{
+  "components": [
+    {
+      "category": "content",
+      "description": "3D Vietnamese fruit companion avatar (Ổi, Măng Cụt, Sầu Riêng, Thanh Long, Bưởi, Vú Sữa, Xoài, Chôm Chôm, Vải)",
+      "markup": "<img class=\"avatar-fruit\" src=\"/images/fruits/guava.png\" alt=\"Ổi\" />\n",
+      "name": "Avatar/FruitCompanion",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.surface",
+        "colors.border-subtle",
+        "spacing.space-2",
+        "radius.radius-pill"
+      ],
+      "variants": [
+        "Size=20px",
+        "Size=32px",
+        "Size=112px",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "feedback",
+      "description": "Semantic qualification route badge (Route: Priority, Route: Explore, Route: Nurture) in Sales & Recruiting deliverables",
+      "markup": "<span class=\"badge-lead-route\">Route: Priority</span>\n",
+      "name": "Badge/LeadRouteTag",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.accent",
+        "colors.accent-foreground",
+        "colors.success",
+        "colors.warning",
+        "colors.info",
+        "spacing.space-1",
+        "spacing.space-2",
+        "radius.radius-sm",
+        "typography.font-family-mono",
+        "typography.font-size-xs"
+      ],
+      "variants": [
+        "Route=Priority",
+        "Route=Explore",
+        "Route=Nurture",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "feedback",
+      "description": "Monospace count and status badge used on Searched the web (3), Routines (In 1h), and CLI Core (5/5)",
+      "markup": "<span class=\"badge-status-count\">5/5</span>\n",
+      "name": "Badge/StatusCount",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.primary",
+        "colors.primary-foreground",
+        "colors.secondary",
+        "colors.muted-foreground",
+        "colors.success",
+        "spacing.space-1",
+        "spacing.space-2",
+        "radius.radius-pill",
+        "typography.font-family-mono",
+        "typography.font-size-xs"
+      ],
+      "variants": [
+        "Tone=Primary",
+        "Tone=Neutral",
+        "Tone=Success",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "action",
+      "description": "28x28px header and Right-Hand Sidebar icon toggle button (Notifications, Sidebar Collapse, Attach Plus)",
+      "markup": "<button class=\"btn-icon\" aria-label=\"Toggle Right Sidebar\"></button>\n",
+      "name": "Button/IconControl",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.bg",
+        "colors.bg-foreground",
+        "colors.surface-hover",
+        "colors.surface-active",
+        "colors.border",
+        "spacing.space-2",
+        "radius.radius-sm",
+        "duration.duration-fast"
+      ],
+      "variants": [
+        "Size=28px",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "action",
+      "description": "Coral-guava primary CTA button and composer submit trigger (#B9382C fill, #FFFFFF label, 32px height, 10px/pill radius)",
+      "markup": "<button class=\"btn-primary\">Gửi yêu cầu</button>\n",
+      "name": "Button/Primary",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.primary",
+        "colors.primary-foreground",
+        "colors.primary-hover",
+        "colors.primary-active",
+        "colors.ring",
+        "spacing.space-3",
+        "spacing.space-2",
+        "radius.radius-md",
+        "typography.font-family-sans",
+        "typography.font-size-body",
+        "duration.duration-fast"
+      ],
+      "variants": [
+        "Size=32px",
+        "Shape=Rounded",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "action",
+      "description": "Warm neutral secondary pill button for quick actions (Skills, Meetings, Apps, Help) under Plaza composer",
+      "markup": "<button class=\"btn-secondary\">Skills</button>\n",
+      "name": "Button/Secondary",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.secondary",
+        "colors.secondary-foreground",
+        "colors.secondary-hover",
+        "colors.secondary-active",
+        "colors.border",
+        "spacing.space-3",
+        "spacing.space-2",
+        "radius.radius-pill",
+        "typography.font-family-sans",
+        "typography.font-size-small",
+        "duration.duration-fast"
+      ],
+      "variants": [
+        "Tone=WarmNeutral",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "content",
+      "description": "Local and MCP connector status tile in /apps (GitHub, Google Calendar, Gmail, Notion, Linear, Slack)",
+      "markup": "<article class=\"card-connected-app\"><h4>GitHub</h4><span class=\"status-connected\">Connected</span></article>\n",
+      "name": "Card/ConnectedAppTile",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.card",
+        "colors.card-foreground",
+        "colors.success",
+        "colors.border",
+        "spacing.space-4",
+        "radius.radius-lg",
+        "typography.font-family-sans",
+        "typography.font-size-title",
+        "typography.font-size-small"
+      ],
+      "variants": [
+        "Connection=Connected",
+        "Connection=Available",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "content",
+      "description": "Warm surface onboarding suggestion card on Plaza (Khám phá Ổi Browser / Mời bạn bè dùng Ổi Browser)",
+      "markup": "<article class=\"card-idea-suggestion\"><h3>Khám phá Ổi Browser</h3><p>Tell me what you work on, and I will show you the features, skills and apps that help most.</p><span>Coach me</span></article>\n",
+      "name": "Card/IdeaSuggestion",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.card",
+        "colors.card-foreground",
+        "colors.muted-foreground",
+        "colors.surface-hover",
+        "colors.border-subtle",
+        "spacing.space-4",
+        "spacing.space-5",
+        "radius.radius-xl",
+        "typography.font-family-sans",
+        "typography.font-size-title",
+        "typography.font-size-caption"
+      ],
+      "variants": [
+        "Slot=Coach",
+        "Slot=Invite",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "content",
+      "description": "Meeting transcript summary and extracted action items card in /meetings",
+      "markup": "<article class=\"card-meeting-note\"><h4>Architecture Kickoff</h4><p>2 extracted action items</p></article>\n",
+      "name": "Card/MeetingTranscriptNote",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.card",
+        "colors.card-foreground",
+        "colors.muted-foreground",
+        "colors.border",
+        "colors.primary",
+        "spacing.space-4",
+        "radius.radius-lg",
+        "typography.font-family-sans",
+        "typography.font-size-title",
+        "typography.font-size-body"
+      ],
+      "variants": [
+        "Recording=Complete",
+        "Recording=Live",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "content",
+      "description": "Automated cron routine card in /routines showing companion avatar, cron schedule, next run countdown, and last run status",
+      "markup": "<article class=\"card-routine-row\"><h4>Morning Priorities</h4><span>30 8 * * 1-5 · Asia/Ho_Chi_Minh</span></article>\n",
+      "name": "Card/RoutineScheduleRow",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.card",
+        "colors.card-foreground",
+        "colors.muted-foreground",
+        "colors.border",
+        "colors.success",
+        "spacing.space-4",
+        "radius.radius-lg",
+        "typography.font-family-sans",
+        "typography.font-family-mono",
+        "typography.font-size-title"
+      ],
+      "variants": [
+        "Enabled=True",
+        "Enabled=False",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "content",
+      "description": "Official skill card in /skills displaying skill slug, category badge, description, and companion affinity",
+      "markup": "<article class=\"card-skill-item\"><h4>find-prospects</h4><p>Discover and qualify high-intent target accounts and leads.</p></article>\n",
+      "name": "Card/SkillDirectoryItem",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.card",
+        "colors.card-foreground",
+        "colors.muted-foreground",
+        "colors.border",
+        "colors.primary",
+        "spacing.space-4",
+        "radius.radius-lg",
+        "typography.font-family-sans",
+        "typography.font-family-mono",
+        "typography.font-size-title",
+        "typography.font-size-caption"
+      ],
+      "variants": [
+        "Category=Sales",
+        "Category=General",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "form",
+      "description": "Selectable category filter pill (All 12, General, Sales, Recruiting, Engineering) on Use Cases and Skills",
+      "markup": "<button class=\"chip-filter chip-filter--selected\">All 12</button>\n",
+      "name": "Chip/CategoryFilter",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.bg-foreground",
+        "colors.bg",
+        "colors.secondary",
+        "colors.secondary-foreground",
+        "colors.border",
+        "spacing.space-2",
+        "spacing.space-3",
+        "radius.radius-pill",
+        "typography.font-family-sans",
+        "typography.font-size-small"
+      ],
+      "variants": [
+        "Selected=True",
+        "Selected=False",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "content",
+      "description": "Interactive 3D browser-window starter kit card on /use-cases featuring /command bubble, mini browser chrome, 3D fruit mascot, and connector pills",
+      "markup": "<article class=\"use-case-starter-book\"><div class=\"command-pill\">/create-companions</div><h3>Create Companions</h3></article>\n",
+      "name": "Content/UseCaseStarterBook",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.card",
+        "colors.card-foreground",
+        "colors.bg",
+        "colors.surface-hover",
+        "colors.border",
+        "spacing.space-4",
+        "spacing.space-5",
+        "radius.radius-xl",
+        "typography.font-family-sans",
+        "typography.font-family-mono",
+        "typography.font-size-heading",
+        "typography.font-size-body"
+      ],
+      "variants": [
+        "Deck=General",
+        "Deck=Sales",
+        "Deck=Engineering",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "content",
+      "description": "Expandable multi-step agent execution trace card in Chat (Updated crm.md -> Searched the web, Read pages, Used CLI harness, Updated crm.md)",
+      "markup": "<section class=\"work-trace-accordion\"><header>Updated crm.md (and 3 more actions)</header><ul><li>Searched the web</li><li>Read pages</li><li>Used CLI harness</li></ul></section>\n",
+      "name": "Content/WorkTraceAccordion",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.surface",
+        "colors.bg",
+        "colors.bg-foreground",
+        "colors.muted-foreground",
+        "colors.primary",
+        "colors.border-subtle",
+        "spacing.space-3",
+        "spacing.space-4",
+        "radius.radius-lg",
+        "typography.font-family-sans",
+        "typography.font-family-mono",
+        "typography.font-size-small"
+      ],
+      "variants": [
+        "Expanded=False",
+        "Expanded=True",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "overlay",
+      "description": "Searchable companion session history modal/drawer launched from Chat History in the Right-Hand Sidebar",
+      "markup": "<dialog class=\"dialog-chat-history\" open><header>Chat History</header></dialog>\n",
+      "name": "Dialog/ChatHistoryDrawer",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.popover",
+        "colors.popover-foreground",
+        "colors.surface-hover",
+        "colors.border",
+        "spacing.space-4",
+        "spacing.space-6",
+        "radius.radius-xl",
+        "typography.font-family-sans",
+        "typography.font-size-heading",
+        "typography.font-size-body"
+      ],
+      "variants": [
+        "Mode=Modal",
+        "State=Empty",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "form",
+      "description": "Center Plaza hero stage combining 3D Vietnamese fruit mascot, 24px-radius prompt composer, mode selector, and quick-action bar",
+      "markup": "<section class=\"plaza-hero-composer\"><textarea placeholder=\"Work with Ổi...\"></textarea><button class=\"btn-submit\">Send</button></section>\n",
+      "name": "Form/PlazaHeroComposer",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.bg",
+        "colors.bg-foreground",
+        "colors.muted-foreground",
+        "colors.primary",
+        "colors.primary-foreground",
+        "colors.border",
+        "spacing.composer-max-width",
+        "spacing.space-4",
+        "radius.radius-composer",
+        "typography.font-family-sans",
+        "typography.font-size-body"
+      ],
+      "variants": [
+        "Mode=Default",
+        "Mode=Expert",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "form",
+      "description": "Full-width pill search input on Skills, Use Cases, Library, and Databases screens",
+      "markup": "<input class=\"input-search-pill\" type=\"search\" placeholder=\"Search starter kits and official skills...\" />\n",
+      "name": "Input/SearchField",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.bg",
+        "colors.bg-foreground",
+        "colors.muted-foreground",
+        "colors.border",
+        "colors.border-focus",
+        "colors.ring",
+        "spacing.space-3",
+        "spacing.space-4",
+        "radius.radius-pill",
+        "typography.font-family-sans",
+        "typography.font-size-body"
+      ],
+      "variants": [
+        "Width=Fluid",
+        "State=Empty",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "layout",
+      "description": "Root application shell (.home-sidebar-layout with flex-direction: row-reverse) placing the 1150px workspace stage on the left and the 290px Navigation Dock on the right",
+      "markup": "<div class=\"home-sidebar-layout\"><aside class=\"right-hand-sidebar\">Ổi Browser</aside><main class=\"home-sidebar-content\"></main></div>\n",
+      "name": "Layout/RightHandSidebarShell",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.bg",
+        "colors.bg-foreground",
+        "colors.surface",
+        "colors.border",
+        "spacing.sidebar-width",
+        "spacing.space-4",
+        "typography.font-family-sans",
+        "typography.font-family-display"
+      ],
+      "variants": [
+        "Sidebar=RightExpanded",
+        "Sidebar=RightCollapsed",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "content",
+      "description": "Chronological audit feed of companion tool calls, DOM inspections, CLI dispatches, and Karpathy-Wiki writes in /timeline",
+      "markup": "<ol class=\"list-activity-timeline\"><li>Xoài updated knowledge/crm.md via claude CLI harness</li></ol>\n",
+      "name": "List/ActivityTimelineFeed",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.bg",
+        "colors.bg-foreground",
+        "colors.surface",
+        "colors.muted-foreground",
+        "colors.border-subtle",
+        "colors.success",
+        "spacing.space-3",
+        "spacing.space-4",
+        "radius.radius-md",
+        "typography.font-family-sans",
+        "typography.font-family-mono",
+        "typography.font-size-body"
+      ],
+      "variants": [
+        "Filter=All",
+        "Filter=ToolCalls",
+        "State=Empty",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "navigation",
+      "description": "Top-center floating companion switcher pill bar on Plaza featuring active 3D fruit companion badge and quick-switch avatars",
+      "markup": "<nav class=\"companion-top-pill-bar\"><button class=\"pill-active\"><img src=\"/images/fruits/guava.png\" alt=\"Ổi\" /><span>Ổi</span></button></nav>\n",
+      "name": "Navigation/CompanionTopPillBar",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.surface",
+        "colors.bg",
+        "colors.bg-foreground",
+        "colors.border",
+        "spacing.space-1",
+        "spacing.space-3",
+        "radius.radius-pill",
+        "typography.font-family-sans",
+        "typography.font-size-small"
+      ],
+      "variants": [
+        "Expanded=False",
+        "Expanded=True",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "navigation",
+      "description": "Recent companion chat row in the Right-Hand Sidebar pairing a 20px 3D fruit icon with localized session title",
+      "markup": "<a class=\"nav-recent-chat-item\" href=\"/chat/session-sales-sally\"><img src=\"/images/fruits/mango.png\" alt=\"Xoài\" /><span>Làm việc cùng Xoài</span></a>\n",
+      "name": "Navigation/RecentChatItem",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.bg",
+        "colors.bg-foreground",
+        "colors.surface-hover",
+        "colors.surface-active",
+        "spacing.space-2",
+        "spacing.space-3",
+        "radius.radius-md",
+        "typography.font-family-sans",
+        "typography.font-size-small"
+      ],
+      "variants": [
+        "Selected=True",
+        "Selected=False",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "navigation",
+      "description": "Primary navigation row inside the 290px Right-Hand Sidebar (New Chat, Chat History, Routines, Apps, Skills, Databases, Timeline, Meetings, Library)",
+      "markup": "<a class=\"nav-right-sidebar-item\" href=\"/newtab\"><span>New Chat</span></a>\n",
+      "name": "Navigation/RightSidebarItem",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.bg",
+        "colors.bg-foreground",
+        "colors.surface-hover",
+        "colors.surface-active",
+        "colors.muted-foreground",
+        "spacing.space-2",
+        "spacing.space-3",
+        "radius.radius-md",
+        "typography.font-family-sans",
+        "typography.font-size-body"
+      ],
+      "variants": [
+        "Active=True",
+        "Active=False",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "overlay",
+      "description": "Bottom-left (left: 20px; bottom: 20px) floating CLI Core status pill (AUTO 5/5) and expandable multi-CLI terminal drawer (claude, agy, codex, grok, orca)",
+      "markup": "<aside class=\"cli-harness-dock\" style=\"left:20px;bottom:20px\"><button class=\"cli-pill\">CLI Core: AUTO (5/5)</button></aside>\n",
+      "name": "Overlay/CliHarnessDock",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.bg",
+        "colors.bg-foreground",
+        "colors.surface",
+        "colors.success",
+        "colors.border",
+        "spacing.cli-dock-offset",
+        "spacing.space-2",
+        "spacing.space-3",
+        "radius.radius-pill",
+        "typography.font-family-sans",
+        "typography.font-family-mono",
+        "typography.font-size-xs"
+      ],
+      "variants": [
+        "Drawer=Collapsed",
+        "Drawer=Expanded",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    },
+    {
+      "category": "content",
+      "description": "Structured SQLite, Karpathy-Wiki, and Spreadsheet visual artifact data grid in /databases and /library",
+      "markup": "<table class=\"table-agent-db\"><thead><tr><th>ID</th><th>Type</th><th>Content</th></tr></thead><tbody><tr><td>oi-1</td><td>LEAD</td><td>peerd</td></tr></tbody></table>\n",
+      "name": "Table/AgentDatabaseGrid",
+      "scope": "local",
+      "tokensUsed": [
+        "colors.bg",
+        "colors.bg-foreground",
+        "colors.surface",
+        "colors.surface-hover",
+        "colors.border",
+        "colors.border-subtle",
+        "spacing.space-3",
+        "spacing.space-4",
+        "radius.radius-lg",
+        "typography.font-family-sans",
+        "typography.font-family-mono",
+        "typography.font-size-small"
+      ],
+      "variants": [
+        "Density=Compact",
+        "Density=Default",
+        "State=Empty",
+        "State=Default",
+        "State=Hover",
+        "State=Active",
+        "State=Focus",
+        "State=Disabled"
+      ]
+    }
+  ],
+  "version": "0.1.0"
+}

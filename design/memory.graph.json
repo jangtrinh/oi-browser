@@ -1,0 +1,51 @@
+{
+  "v": 1,
+  "compiledAt": "2026-10-28T00:33:25.809Z",
+  "eventCount": 9,
+  "halfLifeDays": 30,
+  "personas": {},
+  "axes": {},
+  "vibes": [],
+  "tokens": {
+    "colors.primary": {
+      "changes": 1,
+      "lastReason": "Ensure >= 4.5:1 AA contrast on primary CTA"
+    }
+  },
+  "designs": {
+    "right-hand-sidebar-sveltekit": {
+      "medium": [],
+      "picked": true
+    }
+  },
+  "insights": [
+    {
+      "id": "e8",
+      "t": "2026-10-28T00:33:25.598Z",
+      "text": "Moving the 290px Navigation Sidebar to the Right-Hand Side via .home-sidebar-layout { flex-direction: row-reverse !important; } while anchoring #oi-cli-dock-root at bottom-left (left: 20px; bottom: 20px) preserves 100% of SvelteKit 5 behavior with zero footer overlap.",
+      "refs": [
+        "e1",
+        "e2",
+        "e3"
+      ],
+      "seen": 1,
+      "upvotes": 0,
+      "downvotes": 0,
+      "lastSeenAt": "2026-10-28T00:33:25.598Z"
+    },
+    {
+      "id": "e9",
+      "t": "2026-10-28T00:33:25.717Z",
+      "text": "Structuring design/ontology.tokens.json into 3 tiers (primitive-* -> semantic-* -> composite-*) and sealing 76 tokens in design/design.tokens.json guarantees 100% WCAG AA contrast across all 15 text x surface pairs and 24 components.",
+      "refs": [
+        "e1",
+        "e2",
+        "e3"
+      ],
+      "seen": 1,
+      "upvotes": 0,
+      "downvotes": 0,
+      "lastSeenAt": "2026-10-28T00:33:25.717Z"
+    }
+  ]
+}

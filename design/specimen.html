@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>oi-browser &mdash; Design System Specimen</title>
+<style>
+:root {
+  --colors-accent: #fdf2f3;
+  --colors-accent-foreground: #7f231b;
+  --colors-bg: #ffffff;
+  --colors-bg-active: #e4e4e7;
+  --colors-bg-foreground: #18181b;
+  --colors-bg-hover: #f4f4f5;
+  --colors-border: #e4e4e7;
+  --colors-border-focus: #b9382c;
+  --colors-border-strong: #d4d4d8;
+  --colors-border-subtle: #f1f0ec;
+  --colors-canvas: #fcfcfb;
+  --colors-canvas-foreground: #18181b;
+  --colors-card: #f7f6f4;
+  --colors-card-foreground: #18181b;
+  --colors-component: #0e7490;
+  --colors-component-foreground: #ffffff;
+  --colors-destructive: #b91c1c;
+  --colors-destructive-foreground: #ffffff;
+  --colors-info: #1d4ed8;
+  --colors-info-foreground: #ffffff;
+  --colors-input: #e4e4e7;
+  --colors-muted: #f4f4f5;
+  --colors-muted-foreground: #52525b;
+  --colors-neutral: #52525b;
+  --colors-neutral-foreground: #ffffff;
+  --colors-popover: #ffffff;
+  --colors-popover-foreground: #18181b;
+  --colors-primary: #b9382c;
+  --colors-primary-active: #7f231b;
+  --colors-primary-foreground: #ffffff;
+  --colors-primary-hover: #9f2f25;
+  --colors-ring: #b9382c;
+  --colors-secondary: #f1f0ec;
+  --colors-secondary-active: #d4d2cd;
+  --colors-secondary-foreground: #18181b;
+  --colors-secondary-hover: #e6e4e0;
+  --colors-success: #15803d;
+  --colors-success-foreground: #ffffff;
+  --colors-surface: #f7f6f4;
+  --colors-surface-active: #e6e4e0;
+  --colors-surface-foreground: #18181b;
+  --colors-surface-hover: #f1f0ec;
+  --colors-warning: #b45309;
+  --colors-warning-foreground: #ffffff;
+  --duration-duration-fast: 100ms;
+  --duration-duration-normal: 180ms;
+  --duration-duration-slow: 280ms;
+  --radius-radius-composer: 24px;
+  --radius-radius-lg: 14px;
+  --radius-radius-md: 10px;
+  --radius-radius-pill: 9999px;
+  --radius-radius-sm: 6px;
+  --radius-radius-xl: 20px;
+  --radius-radius-xs: 4px;
+  --spacing-cli-dock-offset: 20px;
+  --spacing-composer-max-width: 720px;
+  --spacing-sidebar-width: 290px;
+  --spacing-space-1: 4px;
+  --spacing-space-10: 40px;
+  --spacing-space-12: 48px;
+  --spacing-space-2: 8px;
+  --spacing-space-3: 12px;
+  --spacing-space-4: 16px;
+  --spacing-space-5: 20px;
+  --spacing-space-6: 24px;
+  --spacing-space-8: 32px;
+  --typography-font-family-display: Playfair Display, Georgia, serif;
+  --typography-font-family-mono: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --typography-font-family-sans: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  --typography-font-size-body: 14px;
+  --typography-font-size-caption: 13px;
+  --typography-font-size-heading: 20px;
+  --typography-font-size-hero: 32px;
+  --typography-font-size-small: 12px;
+  --typography-font-size-title: 16px;
+  --typography-font-size-xs: 11px;
+}
+
+/* ── Specimen chrome — every value resolves through the compiled semantic tier ── */
+* { box-sizing: border-box; margin: 0; }
+body {
+  background: var(--color-background); color: var(--color-foreground);
+  font-family: var(--font-family-body); font-size: var(--font-size-sm);
+  line-height: 1.55; padding: 56px 24px 96px;
+}
+main { max-width: 1040px; margin: 0 auto; }
+:focus-visible { outline: 2px solid var(--color-ring, var(--color-primary)); outline-offset: 2px; }
+h1 { font-family: var(--font-family-display); font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); letter-spacing: -0.02em; }
+.meta { color: var(--color-muted-foreground); font-size: var(--font-size-xs); }
+.muted { color: var(--color-muted-foreground); }
+.lead { max-width: 660px; margin-top: 14px; }
+.badge-aa {
+  display: inline-block; padding: 2px 10px; border-radius: var(--radius-full);
+  background: var(--color-success); color: var(--color-success-foreground);
+  font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);
+}
+section { margin-top: 64px; }
+.kicker {
+  font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-muted-foreground);
+  border-bottom: 1px solid var(--color-border); padding-bottom: 8px; margin-bottom: 20px;
+}
+.section-note { color: var(--color-muted-foreground); font-size: var(--font-size-xs); margin: 18px 0 10px; }
+
+/* Color pairs */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.swatch { border: 1px solid var(--color-border); border-radius: var(--radius-card); overflow: hidden; background: var(--color-card); }
+.swatch .chip { height: 76px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); }
+.swatch .info { padding: 8px 12px; font-size: var(--font-size-xs); color: var(--color-card-foreground); }
+.swatch .info code { color: var(--color-muted-foreground); font-family: ui-monospace, Menlo, monospace; }
+
+/* Typography ramp */
+.type-row { display: flex; align-items: baseline; gap: 20px; padding: 10px 0; border-bottom: 1px dashed var(--color-border); }
+.type-row .tag { width: 150px; flex: none; }
+
+/* Shape, depth, motion */
+.chips { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+.rchip { background: var(--color-card); border: 1px solid var(--color-border); padding: 18px 22px; font-size: var(--font-size-xs); color: var(--color-card-foreground); }
+.echip { background: var(--color-card); border-radius: var(--radius-card); padding: 18px 22px; font-size: var(--font-size-xs); color: var(--color-card-foreground); }
+.dchip { background: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-button); padding: 10px 14px; font-size: var(--font-size-xs); color: var(--color-card-foreground); font-family: ui-monospace, Menlo, monospace; }
+
+/* Components */
+.comp { margin-top: 36px; }
+.comp-kicker {
+  font-size: var(--font-size-md); font-weight: var(--font-weight-semibold);
+  color: var(--color-foreground); border-bottom: 1px solid var(--color-border);
+  padding-bottom: 8px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px;
+}
+.comp-variants { margin-bottom: 16px; }
+.status-tag {
+  font-size: var(--font-size-xs); font-weight: var(--font-weight-medium);
+  padding: 1px 8px; border-radius: var(--radius-full);
+  background: var(--color-muted); color: var(--color-muted-foreground);
+}
+.ui-specimen__frame { background: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: var(--space-6); }
+
+/* Motion floor (taste-rubric): every animated fragment stops under reduced-motion. */
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* Footer */
+.foot { margin-top: 72px; border-top: 1px solid var(--color-border); padding-top: 16px; }
+.foot code { font-family: ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="kicker">oi-browser &middot; Design System Specimen</p>
+    <h1>oi-browser</h1>
+    <p class="meta" style="margin-top:10px">generation 26 &middot; persona <strong>imported</strong> &middot; 76 tokens &middot; <span class="badge-aa">paired AA &mdash; 15 pairs &middot; 0 failures &middot; min 5.02:1</span></p>
+    <p class="lead">imported from design/tokens.json</p>
+  </header>
+  <section aria-labelledby="s-color">
+    <h2 class="kicker" id="s-color">Color &mdash; paired roles</h2>
+    <div class="swatches">
+      <div class="swatch"><div class="chip" style="background:var(--colors-accent);color:var(--colors-accent-foreground)">Aa</div><div class="info">colors.accent / colors.accent-foreground<br><code>#fdf2f3 / #7f231b &middot; 8.88:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-bg);color:var(--colors-bg-foreground)">Aa</div><div class="info">colors.bg / colors.bg-foreground<br><code>#ffffff / #18181b &middot; 17.72:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-canvas);color:var(--colors-canvas-foreground)">Aa</div><div class="info">colors.canvas / colors.canvas-foreground<br><code>#fcfcfb / #18181b &middot; 17.26:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-card);color:var(--colors-card-foreground)">Aa</div><div class="info">colors.card / colors.card-foreground<br><code>#f7f6f4 / #18181b &middot; 16.4:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-component);color:var(--colors-component-foreground)">Aa</div><div class="info">colors.component / colors.component-foreground<br><code>#0e7490 / #ffffff &middot; 5.36:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-destructive);color:var(--colors-destructive-foreground)">Aa</div><div class="info">colors.destructive / colors.destructive-foreground<br><code>#b91c1c / #ffffff &middot; 6.47:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-info);color:var(--colors-info-foreground)">Aa</div><div class="info">colors.info / colors.info-foreground<br><code>#1d4ed8 / #ffffff &middot; 6.7:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-muted);color:var(--colors-muted-foreground)">Aa</div><div class="info">colors.muted / colors.muted-foreground<br><code>#f4f4f5 / #52525b &middot; 7.03:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-neutral);color:var(--colors-neutral-foreground)">Aa</div><div class="info">colors.neutral / colors.neutral-foreground<br><code>#52525b / #ffffff &middot; 7.73:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-popover);color:var(--colors-popover-foreground)">Aa</div><div class="info">colors.popover / colors.popover-foreground<br><code>#ffffff / #18181b &middot; 17.72:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-primary);color:var(--colors-primary-foreground)">Aa</div><div class="info">colors.primary / colors.primary-foreground<br><code>#b9382c / #ffffff &middot; 5.73:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-secondary);color:var(--colors-secondary-foreground)">Aa</div><div class="info">colors.secondary / colors.secondary-foreground<br><code>#f1f0ec / #18181b &middot; 15.54:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-success);color:var(--colors-success-foreground)">Aa</div><div class="info">colors.success / colors.success-foreground<br><code>#15803d / #ffffff &middot; 5.02:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-surface);color:var(--colors-surface-foreground)">Aa</div><div class="info">colors.surface / colors.surface-foreground<br><code>#f7f6f4 / #18181b &middot; 16.4:1</code></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--colors-warning);color:var(--colors-warning-foreground)">Aa</div><div class="info">colors.warning / colors.warning-foreground<br><code>#b45309 / #ffffff &middot; 5.02:1</code></div></div>
+    </div>
+  </section>
+  <section aria-labelledby="s-type">
+    <h2 class="kicker" id="s-type">Typography &mdash; the size ramp</h2>
+  </section>
+  <section aria-labelledby="s-shape">
+    <h2 class="kicker" id="s-shape">Shape &amp; depth</h2>
+    <div class="chips">
+      <div class="rchip" style="border-radius:var(--radius-radius-composer)">radius-radius-composer &middot; 24px</div>
+      <div class="rchip" style="border-radius:var(--radius-radius-lg)">radius-radius-lg &middot; 14px</div>
+      <div class="rchip" style="border-radius:var(--radius-radius-md)">radius-radius-md &middot; 10px</div>
+      <div class="rchip" style="border-radius:var(--radius-radius-pill)">radius-radius-pill &middot; 9999px</div>
+      <div class="rchip" style="border-radius:var(--radius-radius-sm)">radius-radius-sm &middot; 6px</div>
+      <div class="rchip" style="border-radius:var(--radius-radius-xl)">radius-radius-xl &middot; 20px</div>
+      <div class="rchip" style="border-radius:var(--radius-radius-xs)">radius-radius-xs &middot; 4px</div>
+    </div>
+  </section>
+  <section aria-labelledby="s-motion">
+    <h2 class="kicker" id="s-motion">Motion &mdash; durations</h2>
+    <div class="chips">
+      <div class="dchip">duration.duration-fast &middot; 100ms</div>
+      <div class="dchip">duration.duration-normal &middot; 180ms</div>
+      <div class="dchip">duration.duration-slow &middot; 280ms</div>
+    </div>
+  </section>
+  <section aria-labelledby="s-components">
+    <h2 class="kicker" id="s-components">Components &mdash; from the registry</h2>
+    <article class="comp" aria-labelledby="c-avatar-fruitcompanion">
+      <h3 class="comp-kicker" id="c-avatar-fruitcompanion">1 · Avatar/FruitCompanion</h3>
+      <p class="meta comp-variants">Size=20px · Size=32px · Size=112px · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><img class="avatar-fruit" src="/images/fruits/guava.png" alt="Ổi" />
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-badge-leadroutetag">
+      <h3 class="comp-kicker" id="c-badge-leadroutetag">2 · Badge/LeadRouteTag</h3>
+      <p class="meta comp-variants">Route=Priority · Route=Explore · Route=Nurture · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><span class="badge-lead-route">Route: Priority</span>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-badge-statuscount">
+      <h3 class="comp-kicker" id="c-badge-statuscount">3 · Badge/StatusCount</h3>
+      <p class="meta comp-variants">Tone=Primary · Tone=Neutral · Tone=Success · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><span class="badge-status-count">5/5</span>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-button-iconcontrol">
+      <h3 class="comp-kicker" id="c-button-iconcontrol">4 · Button/IconControl</h3>
+      <p class="meta comp-variants">Size=28px · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><button class="btn-icon" aria-label="Toggle Right Sidebar"></button>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-button-primary">
+      <h3 class="comp-kicker" id="c-button-primary">5 · Button/Primary</h3>
+      <p class="meta comp-variants">Size=32px · Shape=Rounded · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><button class="btn-primary">Gửi yêu cầu</button>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-button-secondary">
+      <h3 class="comp-kicker" id="c-button-secondary">6 · Button/Secondary</h3>
+      <p class="meta comp-variants">Tone=WarmNeutral · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><button class="btn-secondary">Skills</button>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-card-connectedapptile">
+      <h3 class="comp-kicker" id="c-card-connectedapptile">7 · Card/ConnectedAppTile</h3>
+      <p class="meta comp-variants">Connection=Connected · Connection=Available · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><article class="card-connected-app"><h4>GitHub</h4><span class="status-connected">Connected</span></article>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-card-ideasuggestion">
+      <h3 class="comp-kicker" id="c-card-ideasuggestion">8 · Card/IdeaSuggestion</h3>
+      <p class="meta comp-variants">Slot=Coach · Slot=Invite · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><article class="card-idea-suggestion"><h3>Khám phá Ổi Browser</h3><p>Tell me what you work on, and I will show you the features, skills and apps that help most.</p><span>Coach me</span></article>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-card-meetingtranscriptnote">
+      <h3 class="comp-kicker" id="c-card-meetingtranscriptnote">9 · Card/MeetingTranscriptNote</h3>
+      <p class="meta comp-variants">Recording=Complete · Recording=Live · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><article class="card-meeting-note"><h4>Architecture Kickoff</h4><p>2 extracted action items</p></article>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-card-routineschedulerow">
+      <h3 class="comp-kicker" id="c-card-routineschedulerow">10 · Card/RoutineScheduleRow</h3>
+      <p class="meta comp-variants">Enabled=True · Enabled=False · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><article class="card-routine-row"><h4>Morning Priorities</h4><span>30 8 * * 1-5 · Asia/Ho_Chi_Minh</span></article>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-card-skilldirectoryitem">
+      <h3 class="comp-kicker" id="c-card-skilldirectoryitem">11 · Card/SkillDirectoryItem</h3>
+      <p class="meta comp-variants">Category=Sales · Category=General · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><article class="card-skill-item"><h4>find-prospects</h4><p>Discover and qualify high-intent target accounts and leads.</p></article>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-chip-categoryfilter">
+      <h3 class="comp-kicker" id="c-chip-categoryfilter">12 · Chip/CategoryFilter</h3>
+      <p class="meta comp-variants">Selected=True · Selected=False · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><button class="chip-filter chip-filter--selected">All 12</button>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-content-usecasestarterbook">
+      <h3 class="comp-kicker" id="c-content-usecasestarterbook">13 · Content/UseCaseStarterBook</h3>
+      <p class="meta comp-variants">Deck=General · Deck=Sales · Deck=Engineering · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><article class="use-case-starter-book"><div class="command-pill">/create-companions</div><h3>Create Companions</h3></article>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-content-worktraceaccordion">
+      <h3 class="comp-kicker" id="c-content-worktraceaccordion">14 · Content/WorkTraceAccordion</h3>
+      <p class="meta comp-variants">Expanded=False · Expanded=True · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><section class="work-trace-accordion"><header>Updated crm.md (and 3 more actions)</header><ul><li>Searched the web</li><li>Read pages</li><li>Used CLI harness</li></ul></section>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-dialog-chathistorydrawer">
+      <h3 class="comp-kicker" id="c-dialog-chathistorydrawer">15 · Dialog/ChatHistoryDrawer</h3>
+      <p class="meta comp-variants">Mode=Modal · State=Empty · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><dialog class="dialog-chat-history" open><header>Chat History</header></dialog>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-form-plazaherocomposer">
+      <h3 class="comp-kicker" id="c-form-plazaherocomposer">16 · Form/PlazaHeroComposer</h3>
+      <p class="meta comp-variants">Mode=Default · Mode=Expert · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><section class="plaza-hero-composer"><textarea placeholder="Work with Ổi..."></textarea><button class="btn-submit">Send</button></section>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-input-searchfield">
+      <h3 class="comp-kicker" id="c-input-searchfield">17 · Input/SearchField</h3>
+      <p class="meta comp-variants">Width=Fluid · State=Empty · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><input class="input-search-pill" type="search" placeholder="Search starter kits and official skills..." />
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-layout-righthandsidebarshell">
+      <h3 class="comp-kicker" id="c-layout-righthandsidebarshell">18 · Layout/RightHandSidebarShell</h3>
+      <p class="meta comp-variants">Sidebar=RightExpanded · Sidebar=RightCollapsed · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><div class="home-sidebar-layout"><aside class="right-hand-sidebar">Ổi Browser</aside><main class="home-sidebar-content"></main></div>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-list-activitytimelinefeed">
+      <h3 class="comp-kicker" id="c-list-activitytimelinefeed">19 · List/ActivityTimelineFeed</h3>
+      <p class="meta comp-variants">Filter=All · Filter=ToolCalls · State=Empty · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><ol class="list-activity-timeline"><li>Xoài updated knowledge/crm.md via claude CLI harness</li></ol>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-navigation-companiontoppillbar">
+      <h3 class="comp-kicker" id="c-navigation-companiontoppillbar">20 · Navigation/CompanionTopPillBar</h3>
+      <p class="meta comp-variants">Expanded=False · Expanded=True · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><nav class="companion-top-pill-bar"><button class="pill-active"><img src="/images/fruits/guava.png" alt="Ổi" /><span>Ổi</span></button></nav>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-navigation-recentchatitem">
+      <h3 class="comp-kicker" id="c-navigation-recentchatitem">21 · Navigation/RecentChatItem</h3>
+      <p class="meta comp-variants">Selected=True · Selected=False · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><a class="nav-recent-chat-item" href="/chat/session-sales-sally"><img src="/images/fruits/mango.png" alt="Xoài" /><span>Làm việc cùng Xoài</span></a>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-navigation-rightsidebaritem">
+      <h3 class="comp-kicker" id="c-navigation-rightsidebaritem">22 · Navigation/RightSidebarItem</h3>
+      <p class="meta comp-variants">Active=True · Active=False · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><a class="nav-right-sidebar-item" href="/newtab"><span>New Chat</span></a>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-overlay-cliharnessdock">
+      <h3 class="comp-kicker" id="c-overlay-cliharnessdock">23 · Overlay/CliHarnessDock</h3>
+      <p class="meta comp-variants">Drawer=Collapsed · Drawer=Expanded · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><aside class="cli-harness-dock" style="left:20px;bottom:20px"><button class="cli-pill">CLI Core: AUTO (5/5)</button></aside>
+</div>
+    </article>
+    <article class="comp" aria-labelledby="c-table-agentdatabasegrid">
+      <h3 class="comp-kicker" id="c-table-agentdatabasegrid">24 · Table/AgentDatabaseGrid</h3>
+      <p class="meta comp-variants">Density=Compact · Density=Default · State=Empty · State=Default · State=Hover · State=Active · State=Focus · State=Disabled</p>
+      <div class="ui-specimen__frame"><table class="table-agent-db"><thead><tr><th>ID</th><th>Type</th><th>Content</th></tr></thead><tbody><tr><td>oi-1</td><td>LEAD</td><td>peerd</td></tr></tbody></table>
+</div>
+    </article>
+  </section>
+  <footer class="foot">
+    <p class="meta">Generated by <code>ui ds preview</code> from the compiled design system &middot; registry n3kB3Mtm8SXf</p>
+  </footer>
+</main>
+</body>
+</html>

@@ -150,4 +150,17 @@ test("Ổi Browser full-stack verification suite", async (t) => {
     assert.equal(data.meeting.title, "Architecture Kickoff");
     assert.equal(data.meeting.actionItems.length, 2);
   });
+
+  await t.test("DESIGN:OS ontology files (Primitives -> Semantic -> Composite tokens, 24 components, 11 screens, ratified soul) are intact", async () => {
+    const manifest = JSON.parse(fs.readFileSync(new URL("../design/ds.manifest.json", import.meta.url), "utf8"));
+    assert.equal(manifest.name, "oi-browser");
+    const ontology = JSON.parse(fs.readFileSync(new URL("../design/ontology.tokens.json", import.meta.url), "utf8"));
+    assert.ok(ontology["primitive-color"] && ontology["semantic-color"] && ontology["composite-right-sidebar"]);
+    const registry = JSON.parse(fs.readFileSync(new URL("../design/component-registry.json", import.meta.url), "utf8"));
+    assert.equal(registry.components.length, 24);
+    const flow = JSON.parse(fs.readFileSync(new URL("../design/flow.json", import.meta.url), "utf8"));
+    assert.equal(flow.screens.length, 11);
+    const soul = fs.readFileSync(new URL("../design/soul.md", import.meta.url), "utf8");
+    assert.ok(soul.includes("status: ratified"));
+  });
 });

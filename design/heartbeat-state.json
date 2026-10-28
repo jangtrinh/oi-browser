@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "tasks": {
+    "a11y": {
+      "nextRunAt": "2026-10-29T09:48:57.038821+07:00",
+      "lastStatus": "baseline",
+      "lastSummary": {
+        "failures": 0
+      },
+      "suppressCount": 0,
+      "runs": 1,
+      "history": [
+        {
+          "at": "2026-10-28T07:33:26.038821+07:00",
+          "status": "baseline",
+          "summary": {
+            "failures": 0
+          }
+        }
+      ]
+    },
+    "specimen": {
+      "nextRunAt": "2026-10-29T09:48:57.038821+07:00",
+      "lastStatus": "baseline",
+      "lastSummary": {
+        "gaps": 0
+      },
+      "suppressCount": 0,
+      "runs": 1,
+      "history": [
+        {
+          "at": "2026-10-28T07:33:26.038821+07:00",
+          "status": "baseline",
+          "summary": {
+            "gaps": 0
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "changelog": [
+    {
+      "by": "ui ds set-role",
+      "from": "background",
+      "kind": "set-role",
+      "path": "colors.bg-foreground",
+      "to": "foreground",
+      "ts": "2026-10-28T00:29:09.844Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Button/Primary",
+      "ts": "2026-10-28T00:30:06.962Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Button/Secondary",
+      "ts": "2026-10-28T00:30:07.318Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Button/IconControl",
+      "ts": "2026-10-28T00:30:07.634Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Badge/StatusCount",
+      "ts": "2026-10-28T00:30:07.806Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Badge/LeadRouteTag",
+      "ts": "2026-10-28T00:30:08.120Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Avatar/FruitCompanion",
+      "ts": "2026-10-28T00:30:08.213Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Input/SearchField",
+      "ts": "2026-10-28T00:30:08.423Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Chip/CategoryFilter",
+      "ts": "2026-10-28T00:30:08.538Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Navigation/RightSidebarItem",
+      "ts": "2026-10-28T00:30:08.719Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Navigation/RecentChatItem",
+      "ts": "2026-10-28T00:30:08.849Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Navigation/CompanionTopPillBar",
+      "ts": "2026-10-28T00:30:09.199Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Card/IdeaSuggestion",
+      "ts": "2026-10-28T00:30:09.557Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Card/SkillDirectoryItem",
+      "ts": "2026-10-28T00:30:09.844Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Card/ConnectedAppTile",
+      "ts": "2026-10-28T00:30:10.097Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Card/RoutineScheduleRow",
+      "ts": "2026-10-28T00:30:10.272Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Card/MeetingTranscriptNote",
+      "ts": "2026-10-28T00:30:10.409Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Layout/RightHandSidebarShell",
+      "ts": "2026-10-28T00:30:10.550Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Form/PlazaHeroComposer",
+      "ts": "2026-10-28T00:30:10.654Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Content/WorkTraceAccordion",
+      "ts": "2026-10-28T00:30:10.762Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Content/UseCaseStarterBook",
+      "ts": "2026-10-28T00:30:10.872Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Table/AgentDatabaseGrid",
+      "ts": "2026-10-28T00:30:11.051Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "List/ActivityTimelineFeed",
+      "ts": "2026-10-28T00:30:11.239Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Overlay/CliHarnessDock",
+      "ts": "2026-10-28T00:30:11.440Z"
+    },
+    {
+      "by": "ui registry register",
+      "kind": "register",
+      "note": "Dialog/ChatHistoryDrawer",
+      "ts": "2026-10-28T00:30:11.713Z"
+    }
+  ],
+  "compiledHash": "sha256-zPmSseeDsNfCW5qBaj8KSTpSwoMby-jS3ePpDPtCXEA",
+  "createdAt": "2026-10-28T00:28:54.949Z",
+  "generation": 26,
+  "intent": "imported from design/tokens.json",
+  "name": "oi-browser",
+  "persona": {
+    "family": "imported",
+    "slug": "imported"
+  },
+  "registryHash": "sha256-n3kB3Mtm8SXfEopS0IuXiwtpmkLgyzRVMKgTHEli3L4",
+  "version": "1.0.0"
+}
