@@ -3,9 +3,33 @@
   "nodes": [
     {
       "path": "features/cli-harness-router/_index.md",
+      "importance": 95,
+      "tokens": 420,
+      "updatedAt": "2026-10-29T11:53:00+07:00"
+    },
+    {
+      "path": "features/zero-placeholder-runtime/_index.md",
+      "importance": 95,
+      "tokens": 380,
+      "updatedAt": "2026-10-29T11:53:00+07:00"
+    },
+    {
+      "path": "architecture/spec-driven-roadmap/_index.md",
+      "importance": 95,
+      "tokens": 450,
+      "updatedAt": "2026-10-29T11:53:00+07:00"
+    },
+    {
+      "path": "design-system/native-berry-rules/_index.md",
       "importance": 90,
-      "tokens": 240,
-      "updatedAt": "2026-10-27T13:58:00+07:00"
+      "tokens": 340,
+      "updatedAt": "2026-10-29T11:53:00+07:00"
+    },
+    {
+      "path": "session-handoffs/latest.md",
+      "importance": 100,
+      "tokens": 460,
+      "updatedAt": "2026-10-29T11:53:00+07:00"
     }
   ]
 }
