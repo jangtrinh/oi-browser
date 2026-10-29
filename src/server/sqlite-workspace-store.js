@@ -6,14 +6,32 @@ import { OFFICIAL_COMPANIONS, OFFICIAL_ROUTINE_TEMPLATES } from "./official-comp
 
 const OFFICIAL_MAP = new Map(OFFICIAL_COMPANIONS.map((c) => [c.id, c]));
 const DEFAULT_APPEARANCE = OFFICIAL_COMPANIONS[0]?.appearance || null;
+const DEFAULT_INTEGRATIONS = [
+  { id: "linkedin", name: "LinkedIn Sales & Recruiting", logoUrl: "/icons/brands/linkedin.svg", entryUrl: "https://www.linkedin.com", integrationName: "integration:linkedin", toolSlugs: ["sales_navigator_search", "sales_navigator_lead", "recruiter_lite_search"], isConnected: 1 },
+  { id: "github", name: "GitHub Repositories & Issues", logoUrl: "/favicon.svg", entryUrl: "https://github.com", integrationName: "integration:github", toolSlugs: ["github_search_repos", "github_create_pull_request"], isConnected: 1 },
+  { id: "gmail", name: "Google Workspace Mail", logoUrl: "/favicon.svg", entryUrl: "https://mail.google.com", integrationName: "integration:gmail", toolSlugs: ["gmail_send_email", "gmail_create_draft"], isConnected: 1 },
+  { id: "notion", name: "Notion Karpathy-Wiki Sync", logoUrl: "/favicon.svg", entryUrl: "https://www.notion.so", integrationName: "integration:notion", toolSlugs: ["notion_sync_wiki", "notion_create_page"], isConnected: 1 },
+  { id: "slack", name: "Slack Team Channels", logoUrl: "/favicon.svg", entryUrl: "https://app.slack.com", integrationName: "integration:slack", toolSlugs: ["slack_post_message"], isConnected: 0 }
+];
+const DEFAULT_SETTINGS = {
+  searchEngine: "google",
+  sandboxMode: "sandboxed",
+  chatPermissionMode: "ask",
+  adblockerEnabled: true,
+  activityMemoryEnabled: true,
+  preferredMicDeviceId: "default-mic"
+};
+
 function sanitizeMsgContent(raw = "") {
   let s = String(raw).replace(/[\p{Extended_Pictographic}\uFE0F]/gu, "").replace(/^\*\*[^*\n]+\*\*\s*\(`[^`]+`\s*CLI Core[^)\n]*\)\s*\n+/m, "");
   const idx = s.indexOf("### Completed Actions");
   if (idx !== -1) s = `<thinking>\n**Đã thực thi 4 tác vụ nền**\n${s.slice(idx + 21).replace(/`\/[^\n`]+`/g, "`grok-4.7-build-fast` (read-only)").trim()}\n</thinking>\n\n${s.slice(0, idx).trim()}`;
   return s.trim();
 }
+
 export class SqliteWorkspaceStore {
   constructor(dbPath) {
+    this.dbPath = dbPath;
     fs.mkdirSync(path.dirname(dbPath), { recursive: true });
     this.db = new DatabaseSync(dbPath);
     this.initSchema();
@@ -45,6 +63,13 @@ export class SqliteWorkspaceStore {
       CREATE TABLE IF NOT EXISTS meetings (
         id TEXT PRIMARY KEY, title TEXT NOT NULL, duration_sec INTEGER DEFAULT 0,
         transcript_text TEXT NOT NULL, summary_markdown TEXT NOT NULL, action_items_json TEXT DEFAULT '[]', created_at INTEGER NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS integrations (
+        id TEXT PRIMARY KEY, name TEXT NOT NULL, logo_url TEXT NOT NULL, entry_url TEXT NOT NULL,
+        integration_name TEXT NOT NULL, tool_slugs_json TEXT DEFAULT '[]', is_connected INTEGER DEFAULT 1, updated_at INTEGER NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS workspace_settings (
+        key TEXT PRIMARY KEY, value_json TEXT NOT NULL, updated_at INTEGER NOT NULL
       );
     `);
   }
@@ -93,6 +118,14 @@ export class SqliteWorkspaceStore {
         summaryMarkdown: "### Tóm tắt Cuộc họp\n- Đổi tên sản phẩm thành **Ổi Browser** và chuẩn hóa 9 trợ lý AI theo các loại trái cây đặc sản Việt Nam.",
         actionItems: ["Action #1: Kiểm tra 9 trợ lý 3D trên /newtab và /hire/official", "Action #2: Chạy cổng kiểm định design-os ui gate"]
       });
+    }
+    if (this.db.prepare("SELECT COUNT(*) AS c FROM integrations").get().c === 0) {
+      const stmt = this.db.prepare("INSERT INTO integrations VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+      const now = Date.now();
+      for (const a of DEFAULT_INTEGRATIONS) stmt.run(a.id, a.name, a.logoUrl, a.entryUrl, a.integrationName, JSON.stringify(a.toolSlugs), a.isConnected, now);
+    }
+    if (this.db.prepare("SELECT COUNT(*) AS c FROM workspace_settings").get().c === 0) {
+      for (const [k, v] of Object.entries(DEFAULT_SETTINGS)) this.setSetting(k, v);
     }
   }
 
@@ -163,10 +196,23 @@ export class SqliteWorkspaceStore {
 
   listRoutines() { return this.db.prepare("SELECT * FROM routines ORDER BY rowid ASC").all().map((r) => ({ ...r, emoji: "" })); }
 
-  createRoutine({ emoji = "", label, schedule, companionId, prompt }) {
+  createRoutine({ emoji = "", label, schedule = "30 8 * * 1-5", companionId = "research-rosa", prompt = "" }) {
     const id = `routine-${crypto.randomUUID().slice(0, 8)}`;
     this.db.prepare("INSERT INTO routines VALUES (?, ?, ?, ?, ?, ?, 1, NULL, NULL)").run(id, emoji, label, schedule, companionId, prompt);
     return this.db.prepare("SELECT * FROM routines WHERE id = ?").get(id);
+  }
+
+  toggleRoutine(id, enabled) {
+    const cur = this.db.prepare("SELECT * FROM routines WHERE id = ?").get(id);
+    if (!cur) return null;
+    const next = enabled !== undefined ? (enabled ? 1 : 0) : (cur.enabled ? 0 : 1);
+    this.db.prepare("UPDATE routines SET enabled = ? WHERE id = ?").run(next, id);
+    return this.db.prepare("SELECT * FROM routines WHERE id = ?").get(id);
+  }
+
+  deleteRoutine(id) {
+    this.db.prepare("DELETE FROM routines WHERE id = ?").run(id);
+    return this.listRoutines();
   }
 
   recordRoutineRun(id, resultText) {
@@ -194,5 +240,78 @@ export class SqliteWorkspaceStore {
     const id = `mtg-${crypto.randomUUID().slice(0, 8)}`;
     this.db.prepare("INSERT INTO meetings VALUES (?, ?, ?, ?, ?, ?, ?)").run(id, title, durationSec, transcriptText, summaryMarkdown, JSON.stringify(actionItems), Date.now());
     return this.listMeetings().find((m) => m.id === id);
+  }
+
+  listIntegrations() {
+    return this.db.prepare("SELECT * FROM integrations ORDER BY rowid ASC").all().map((row) => ({
+      id: row.id, name: row.name, logoUrl: row.logo_url, entryUrl: row.entry_url,
+      integrationName: row.integration_name, toolSlugs: JSON.parse(row.tool_slugs_json || "[]"),
+      isConnected: Boolean(row.is_connected), updatedAt: row.updated_at
+    }));
+  }
+
+  toggleIntegration(id, isConnected) {
+    const cur = this.db.prepare("SELECT * FROM integrations WHERE id = ?").get(id);
+    if (!cur) return this.listIntegrations();
+    const next = isConnected !== undefined ? (isConnected ? 1 : 0) : (cur.is_connected ? 0 : 1);
+    this.db.prepare("UPDATE integrations SET is_connected = ?, updated_at = ? WHERE id = ?").run(next, Date.now(), id);
+    return this.listIntegrations();
+  }
+
+  addCustomMcp({ id, name, entryUrl = "http://127.0.0.1:4104/mcp", toolSlugs = ["mcp_execute"] }) {
+    const slug = id || `mcp-${String(name || "custom").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+    this.db.prepare("INSERT OR REPLACE INTO integrations VALUES (?, ?, ?, ?, ?, ?, 1, ?)").run(
+      slug, name || slug, "/favicon.svg", entryUrl, `integration:${slug}`, JSON.stringify(toolSlugs), Date.now()
+    );
+    return this.listIntegrations();
+  }
+
+  getSetting(key, fallback = null) {
+    const row = this.db.prepare("SELECT value_json FROM workspace_settings WHERE key = ?").get(key);
+    if (!row) return fallback;
+    try { return JSON.parse(row.value_json); } catch { return fallback; }
+  }
+
+  setSetting(key, value) {
+    this.db.prepare("INSERT OR REPLACE INTO workspace_settings VALUES (?, ?, ?)").run(key, JSON.stringify(value), Date.now());
+    return this.listSettings();
+  }
+
+  listSettings() {
+    const out = { ...DEFAULT_SETTINGS };
+    for (const row of this.db.prepare("SELECT key, value_json FROM workspace_settings").all()) {
+      try { out[row.key] = JSON.parse(row.value_json); } catch {}
+    }
+    return out;
+  }
+
+  introspectDatabase() {
+    const tableRows = this.db.prepare("SELECT name, type FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'wiki_fts_%' ORDER BY name ASC").all();
+    const tables = tableRows.map((t) => {
+      const cols = this.db.prepare(`PRAGMA table_info("${t.name.replace(/"/g, "")}")`).all();
+      let rowCount = 0;
+      try { rowCount = this.db.prepare(`SELECT COUNT(*) AS c FROM "${t.name.replace(/"/g, "")}"`).get().c; } catch {}
+      return {
+        schemaName: "main", tableName: t.name, tableType: "table", rowCount,
+        columns: cols.map((c) => ({ name: c.name, dataType: c.type || "TEXT", nullable: c.notnull === 0, isPrimaryKey: c.pk === 1 }))
+      };
+    });
+    let dbBytes = 4096;
+    try { dbBytes = fs.statSync(this.dbPath).size; } catch {}
+    return {
+      databases: [
+        { dbHandle: "berry-workspace-sqlite", name: `workspace.sqlite (${tables.length} tables · ${Math.round(dbBytes / 1024)} KB)`, isOwner: true, accessKind: "owner", effectiveRole: "admin", status: "ready", sizeBytes: dbBytes }
+      ],
+      tables,
+      dbBytes
+    };
+  }
+
+  executeReadOnlyQuery(sql = "SELECT name FROM sqlite_master WHERE type='table'") {
+    const trimmed = String(sql || "").trim();
+    if (!/^(SELECT|PRAGMA|EXPLAIN)\b/i.test(trimmed)) throw new Error("Only read-only SELECT/PRAGMA queries are allowed");
+    const rows = this.db.prepare(trimmed).all();
+    const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
+    return { columns, rows, rowCount: rows.length };
   }
 }

@@ -30,7 +30,7 @@ export async function handleInvoke(eventName, payload = {}, bridge) {
   await bridge.readyPromise;
   const state = bridge.serverState;
 
-  const domainRes = handleDomainInvoke(eventName, payload, bridge);
+  const domainRes = await handleDomainInvoke(eventName, payload, bridge);
   if (domainRes !== null) return domainRes;
   if (eventName === "auth:get") {
     return {
@@ -40,19 +40,74 @@ export async function handleInvoke(eventName, payload = {}, bridge) {
     };
   }
   if (eventName === "auth:is-admin") return { isAdmin: true };
-  if (eventName === "account:getCreditActivity") return { buckets: [], totalUsed: 120 };
+  if (eventName === "account:getCreditActivity") return { buckets: [], totalUsed: 0 };
   if (eventName === "account:getAutoTopupSettings") return { enabled: false, thresholdCredits: 500, refillCredits: 2500 };
   if (eventName === "account:get-or-create-invite-code") return { success: true, code: "BERRY-LOCAL", remainingInvites: 5 };
-  if (eventName === "team:pending-invite") return { success: true, invites: [], invite: null };
+  if (eventName === "team:pending-invite" || eventName === "team:discover") return { success: true, invites: [], invite: null, teams: [] };
+  if (eventName === "profile:get-all-profiles") {
+    return { profiles: [{ id: PROFILE_ID, name: "Ổi Workspace Local", email: "local@oibrowser.vn", isActive: true, isDefault: true }] };
+  }
+  if (eventName === "sandbox:get-boot-status") {
+    return {
+      status: "ready",
+      message: "OpenJarvis Guardrails & CLI Sandbox active",
+      progress: 100,
+      reason: null,
+      errorEventId: null,
+      backendKind: "local-guardrails",
+      isSandboxed: state.settings?.sandboxMode !== "unrestricted",
+      repairAvailable: false
+    };
+  }
+  if (eventName === "chat-permissions:get-sandbox-mode") return { mode: state.settings?.sandboxMode || "sandboxed" };
+  if (eventName === "chat-permissions:set-sandbox-mode") {
+    await fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: "sandboxMode", value: payload.mode || "sandboxed" }) });
+    await bridge.fetchServerState();
+    return { success: true, mode: payload.mode || "sandboxed" };
+  }
+  if (eventName === "chat-permissions:get-mode") return { mode: state.settings?.chatPermissionMode || "ask" };
+  if (eventName === "chat-permissions:set-mode") {
+    await fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: "chatPermissionMode", value: payload.mode || "ask" }) });
+    await bridge.fetchServerState();
+    return { success: true, mode: payload.mode || "ask" };
+  }
+  if (eventName === "chat-permissions:list-rules") return { rules: [] };
+  if (eventName === "search-engine:get") return { engine: state.settings?.searchEngine || "google", defaultEngine: state.settings?.searchEngine || "google" };
+  if (eventName === "search-engine:set") {
+    await fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: "searchEngine", value: payload.engine || "google" }) });
+    await bridge.fetchServerState();
+    return { success: true };
+  }
+  if (eventName === "browser:is-default") return { isDefault: true };
+  if (eventName === "adblocker:get-enabled") return { enabled: state.settings?.adblockerEnabled !== false };
+  if (eventName === "extensions:get-all") return { extensions: [] };
+  if (eventName === "passwords:get-all") return { passwords: [] };
+  if (eventName === "app:get-version") return { version: "1.0.0" };
+  if (eventName === "storage:get-info") {
+    const usage = state.storageUsage || { wikiBytes: 4096, dbBytes: 32768, wikiFilesCount: 10 };
+    return {
+      totalBytes: usage.wikiBytes + usage.dbBytes,
+      cacheBytes: 0,
+      chatSessionsSize: usage.dbBytes,
+      totalImages: 0,
+      totalSessions: (state.companions || []).length
+    };
+  }
   if (eventName === "settings:get") {
     if (payload.key === "theme") return { value: { mode: bridge.themeMode, hue: 26, tint: 12 } };
     if (payload.key === "dismissedPrompts") return { value: { sidebarMenuIntroduction: { dontShowAgain: true }, libraryWorkspaceIntroduction: { dontShowAgain: true }, companionMemoryIntroduction: { dontShowAgain: true } } };
-    return { value: null };
+    return { value: state.settings?.[payload.key] ?? null };
   }
   if (eventName === "settings:set" || eventName === "settings:set-theme" || eventName === "settings:dismiss-prompt") {
     if (payload.mode || payload.value?.mode) bridge.setThemeMode(payload.mode || payload.value.mode);
+    if (payload.key) {
+      await fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: payload.key, value: payload.value }) });
+      await bridge.fetchServerState();
+    }
     return { success: true };
   }
+  if (eventName === "companions:get-all") return { companions: (state.companions || []).map(toCompanionRuntime) };
+  if (eventName === "companions:get-share-info") return { shares: {} };
   if (eventName === "companions:get-local-skills") {
     const comp = (state.companions || []).find((c) => c.id === payload.companionId);
     const skills = (comp?.skills || []).map((id) => ({ id, name: id, description: `Skill ${id} for ${comp.name}`, instructions: `# ${id}`, userInvocable: true, createdAt: 1730000000000, updatedAt: 1730000000000 }));
@@ -76,7 +131,7 @@ export async function handleInvoke(eventName, payload = {}, bridge) {
     if (typeof window !== "undefined" && window.location.pathname.startsWith("/newtab")) setTimeout(() => { window.location.href = `/chat/${sess.id}`; }, 60);
     return { success: true, sessionId: sess.id, draftDisposition: "consumed", newTabPromoted: true, acceptedOperation: { operationId: `op-${Date.now()}`, kind: "message", createdAt: Date.now() } };
   }
-  if (eventName === "chat:get-agent-downloads" || eventName === "downloads:get-history") return { downloads: [] };
+  if (eventName === "chat:get-agent-downloads" || eventName === "downloads:get-history" || eventName === "downloads:get-recent") return { downloads: [] };
   if (eventName === "chat:cached-recent-sessions-paged" || eventName === "chat:recent-sessions-paged" || eventName === "chat:search-sessions-paged" || eventName === "chat:pinned-sessions") {
     return { sessions: Object.values(bridge.sessionsById), nextCursor: null, hasMore: false, hasExcludedDone: false };
   }
@@ -97,11 +152,19 @@ export async function handleInvoke(eventName, payload = {}, bridge) {
     return { children: (state.memoryFiles || []).map((f, i) => ({ id: `mem-${i}`, name: f.path, path: f.path, type: "file", updatedAt: f.updatedAt || Date.now(), size: f.size || 512 })) };
   }
   if (eventName === "knowledge:read-file") {
-    const f = (state.memoryFiles || []).find((x) => x.path === payload.path) || state.memoryFiles?.[0] || { path: "crm.md" };
-    return { path: f.path, name: f.path, content: `# ${f.path}\n\nDữ liệu bộ nhớ Karpathy-Wiki được đồng bộ trực tiếp trên Ổi Browser.`, updatedAt: f.updatedAt || Date.now() };
+    const targetPath = payload.path || state.memoryFiles?.[0]?.path || "PROFILE.md";
+    try {
+      const res = await fetch(`/api/memory/file?path=${encodeURIComponent(targetPath)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.content) return { path: targetPath, name: targetPath.split("/").pop(), content: data.content, updatedAt: Date.now() };
+      }
+    } catch {}
+    return { path: targetPath, name: targetPath, content: `# ${targetPath}\n`, updatedAt: Date.now() };
   }
   if (eventName === "knowledge:read-report") {
-    const a = (state.artifacts || [])[0] || { title: "Báo cáo Ổi Browser", content_markdown: "# Báo cáo" };
+    const reqId = payload.agentId || payload.id || String(payload.sandboxPath || "").replace(/^\/artifacts\/|\.md$/g, "");
+    const a = (state.artifacts || []).find((x) => x.id === reqId) || (state.artifacts || [])[0] || { title: "Báo cáo Ổi Browser", content_markdown: "# Báo cáo" };
     return { content: a.content_markdown || `# ${a.title}`, title: a.title, timestamp: a.created_at || Date.now() };
   }
   if (eventName === "audio:get-manager-state") return { status: "idle", activeRecordingId: null };
@@ -118,6 +181,17 @@ export async function handleQuery(query = {}, bridge) {
   const domainQueryRes = handleDomainQuery(key, payload, bridge);
   if (domainQueryRes !== null) return domainQueryRes;
 
+  if (key === "profile:listAccountProfiles") {
+    return { success: true, profiles: [{ id: PROFILE_ID, name: "Ổi Workspace Local", email: "local@oibrowser.vn", isActive: true }] };
+  }
+  if (key === "profile:getPasswordSaveBlockedDomains") return { success: true, domains: [] };
+  if (key === "profile:getPaymentMethods") return { success: true, methods: [] };
+  if (key === "syncedFs:storageUsage") {
+    const locations = state.storageUsage?.locations || [
+      { kind: "my-files", id: "my-files", name: "Karpathy-Wiki & Workspace", fileCount: (state.memoryFiles || []).length, sizeBytes: 16384, bytesUsed: 16384, sizeInBytes: 16384 }
+    ];
+    return { success: true, locations };
+  }
   if (key === "companions:listOfficial") {
     return { companions: (state.companions || []).map((c) => ({ id: c.id, name: c.fullName || c.name, summary: c.summary, appearance: c.appearance, visualsSeed: c.visualsSeed || c.id, companionImage: getFruitImageUrl(c.id) })) };
   }
@@ -136,7 +210,8 @@ export async function handleQuery(query = {}, bridge) {
         creator: { name: "Ổi Browser" }
       }
     };
-  }  if (key === "companions:hireProfile") return { success: true, mode: "snapshot", installedCompanionId: payload.officialCompanionId || payload.companionId || "consulting-cora" };
+  }
+  if (key === "companions:hireProfile") return { success: true, mode: "snapshot", installedCompanionId: payload.officialCompanionId || payload.companionId || "consulting-cora" };
   if (key === "companions:getForSession") {
     const sess = bridge.getOrCreateSession(payload.sessionId || "session-rosa-1");
     const c = (state.companions || []).find((x) => x.id === sess.companionId) || state.companions?.[0];
@@ -175,7 +250,15 @@ export async function handleQuery(query = {}, bridge) {
   if (key === "syncedFs:folderTrail") return { success: true, trail: [] };
   if (key === "onboarding:refreshChecklist" || key === "onboarding:dismissAllChecklistItems") return { success: true, state: { status: "absent", eligible: false, visible: false, finished: true, record: null } };
   if (key === "routines:listSuggestions") return { success: true, suggestions: [] };
-  if (key === "routines:listRuns") return { success: true, runs: [] };
+  if (key === "routines:listRuns") {
+    const rList = payload.routineId ? (state.routines || []).filter((r) => r.id === payload.routineId) : (state.routines || []);
+    const runs = rList.filter((r) => r.last_run_at).map((r) => ({
+      id: `run-${r.id}`, routineId: r.id, status: "completed", outcome: "completed",
+      acceptedAt: new Date(r.last_run_at).toISOString(), finishedAt: new Date(r.last_run_at).toISOString(),
+      sessionId: `session-${r.companion_id || "research-rosa"}`, summary: r.last_result || ""
+    }));
+    return { success: true, runs, nextCursor: null };
+  }
   if (key === "layout:getWindow") return { success: true, snapshot: buildLayoutSnapshot(bridge) };
   if (key === "layout:get") return { success: true, data: { schemaVersion: 3, windows: [buildLayoutSnapshot(bridge).window], chats: buildLayoutSnapshot(bridge).chats }, pages: [] };
   if (key === "tabs:openUrl") {

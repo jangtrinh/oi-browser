@@ -197,4 +197,40 @@ test("Ổi Browser full-stack verification suite", async (t) => {
     assert.ok(!execSecretData.run.commandLine.includes("sk-proj1234567890abcdefghij"), "Guardrails must redact API keys before CLI dispatch");
     assert.ok(execSecretData.cliStatus.guardrails.totalRedactions >= 1);
   });
+
+  await t.test("Spec 001 Zero-Placeholder Runtime: Live SQLite schema introspection, persistent integrations, settings, storage usage, and routine mutations", async () => {
+    const stateRes = await fetch(`${baseUrl}/api/state`);
+    const stateData = await stateRes.json();
+    assert.ok(stateData.dbSchema.tables.some((tbl) => tbl.tableName === "companions" && tbl.rowCount === 9));
+    assert.ok(stateData.dbSchema.tables.some((tbl) => tbl.tableName === "integrations"));
+    assert.ok(stateData.storageUsage.wikiBytes > 0);
+    assert.ok(stateData.storageUsage.dbBytes > 0);
+    assert.equal(stateData.settings.sandboxMode, "sandboxed");
+
+    const sqlRes = await fetch(`${baseUrl}/api/databases/query`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sql: "SELECT id, name FROM companions ORDER BY id LIMIT 3" })
+    });
+    assert.equal(sqlRes.status, 200);
+    const sqlData = await sqlRes.json();
+    assert.equal(sqlData.ok, true);
+    assert.equal(sqlData.rows.length, 3);
+
+    const intRes = await fetch(`${baseUrl}/api/integrations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "addCustomMcp", id: "mcp-local-test", name: "Local Test MCP", entryUrl: "http://127.0.0.1:4104/mcp" })
+    });
+    const intData = await intRes.json();
+    assert.ok(intData.integrations.some((i) => i.id === "mcp-local-test" && i.isConnected === true));
+
+    const toggleRoutineRes = await fetch(`${baseUrl}/api/routines`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "toggle", id: stateData.routines[0].id, enabled: false })
+    });
+    const toggleRoutineData = await toggleRoutineRes.json();
+    assert.equal(toggleRoutineData.routine.enabled, 0);
+  });
 });

@@ -45,6 +45,21 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
   const publicDir = path.join(PROJECT_ROOT, "public");
   const clientDir = path.join(PROJECT_ROOT, "src/client");
 
+  const computeStorageUsage = () => {
+    const files = memory.listFiles();
+    const wikiBytes = files.reduce((acc, f) => acc + (f.sizeBytes || f.size || 512), 0);
+    const dbSchema = store.introspectDatabase();
+    return {
+      wikiFilesCount: files.length,
+      wikiBytes,
+      dbBytes: dbSchema.dbBytes,
+      locations: [
+        { kind: "my-files", id: "my-files", name: "Karpathy-Wiki & Workspace Files", fileCount: files.length, sizeBytes: wikiBytes, bytesUsed: wikiBytes, sizeInBytes: wikiBytes },
+        { kind: "profile", id: "profile-sqlite", name: "SQLite Workspace Database", fileCount: 1, sizeBytes: dbSchema.dbBytes, bytesUsed: dbSchema.dbBytes, sizeInBytes: dbSchema.dbBytes }
+      ]
+    };
+  };
+
   const server = http.createServer(async (req, res) => {
     try {
       const { pathname, searchParams } = new URL(req.url, "http://127.0.0.1:4104");
@@ -54,6 +69,9 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
           tabs: store.listTabs(), companions: store.listCompanions(), routines: store.listRoutines(),
           artifacts: store.listArtifacts(), meetings: store.listMeetings(), memoryFiles: memory.listFiles(),
           messages: store.listAllMessages(), officialSkills: OFFICIAL_SKILLS, cliStatus: cliRouter.getStatus(),
+          integrations: store.listIntegrations(), settings: store.listSettings(),
+          dbSchema: store.introspectDatabase(), storageUsage: computeStorageUsage(),
+          telemetry: cliRouter.telemetry.getSummary(),
           ftsStatus: { engine: "SQLite FTS5 BM25", indexedDocs: wikiFts.getDocCount() }
         });
       }
@@ -63,6 +81,24 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
           telemetry: cliRouter.telemetry.getSummary(), guardrails: cliRouter.guardrails.getStatus(),
           skillCatalog: cliRouter.skillCatalog.getStatus(), fts: { indexedDocs: wikiFts.getDocCount() }
         });
+      }
+      if (pathname === "/api/databases" && req.method === "GET") {
+        return sendJson(res, 200, store.introspectDatabase());
+      }
+      if (pathname === "/api/databases/query" && req.method === "POST") {
+        const { sql } = await readJsonBody(req);
+        return sendJson(res, 200, { ok: true, ...store.executeReadOnlyQuery(sql) });
+      }
+      if (pathname === "/api/integrations" && req.method === "POST") {
+        const body = await readJsonBody(req);
+        if (body.action === "addCustomMcp") {
+          return sendJson(res, 200, { integrations: store.addCustomMcp(body) });
+        }
+        return sendJson(res, 200, { integrations: store.toggleIntegration(body.id, body.isConnected) });
+      }
+      if (pathname === "/api/settings" && req.method === "POST") {
+        const { key, value } = await readJsonBody(req);
+        return sendJson(res, 200, { settings: store.setSetting(key, value) });
       }
       if (pathname === "/api/cli/select" && req.method === "POST") {
         const { harnessId } = await readJsonBody(req);
@@ -116,7 +152,15 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
         return res.end(html);
       }
       if (pathname === "/api/routines" && req.method === "POST") {
-        const routine = store.createRoutine(await readJsonBody(req));
+        const body = await readJsonBody(req);
+        if (body.action === "toggle") {
+          const routine = store.toggleRoutine(body.id, body.enabled);
+          return sendJson(res, 200, { routine, routines: store.listRoutines() });
+        }
+        if (body.action === "delete") {
+          return sendJson(res, 200, { routines: store.deleteRoutine(body.id) });
+        }
+        const routine = store.createRoutine(body);
         return sendJson(res, 200, { routine, routines: store.listRoutines() });
       }
       if (pathname === "/api/routines/run" && req.method === "POST") {
@@ -142,9 +186,14 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
       }
       if (pathname === "/api/memory/dream" && req.method === "POST") {
         const { companionId } = await readJsonBody(req);
-        const dream = memory.runDreamConsolidation(companionId || "executive-ellis");
+        const dream = memory.runDreamConsolidation(companionId || "research-rosa");
         wikiFts.syncAllFromDisk();
         return sendJson(res, 200, { dream, files: memory.listFiles() });
+      }
+      if (pathname === "/api/memory/purge" && req.method === "POST") {
+        memory.writeFile("observations/daily-log.md", "# Daily Observations Log\n");
+        wikiFts.syncAllFromDisk();
+        return sendJson(res, 200, { purged: true, files: memory.listFiles() });
       }
       if (pathname === "/api/artifacts" && req.method === "POST") {
         const artifact = store.createArtifact(await readJsonBody(req));

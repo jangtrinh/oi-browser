@@ -130,9 +130,20 @@ window.electronAPI = {
     if (eventName === "theme:set" && payload?.mode) bridge.setThemeMode(payload.mode);
   },
   sendIPCCommand: (cmd) => {
-    if (cmd?.domain === "routines" && cmd?.action === "runNow" && cmd?.payload?.routineId) {
-      fetch("/api/routines/run", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: cmd.payload.routineId }) })
-        .then(() => bridge.fetchServerState());
+    if (cmd?.domain === "routines") {
+      if (cmd.action === "runNow" && cmd.payload?.routineId) {
+        fetch("/api/routines/run", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: cmd.payload.routineId }) })
+          .then(() => bridge.fetchServerState());
+      } else if (cmd.action === "setEnabled" || cmd.action === "toggle") {
+        fetch("/api/routines", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "toggle", id: cmd.payload?.routineId || cmd.payload?.id, enabled: cmd.payload?.enabled }) })
+          .then(() => bridge.fetchServerState());
+      } else if (cmd.action === "delete" && (cmd.payload?.routineId || cmd.payload?.id)) {
+        fetch("/api/routines", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "delete", id: cmd.payload.routineId || cmd.payload.id }) })
+          .then(() => bridge.fetchServerState());
+      } else if (cmd.action === "create") {
+        fetch("/api/routines", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cmd.payload || {}) })
+          .then(() => bridge.fetchServerState());
+      }
     }
   },
   onEvent: (eventName, cb) => {
