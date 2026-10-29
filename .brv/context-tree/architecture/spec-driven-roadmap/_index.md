@@ -1,16 +1,17 @@
-# Architecture Context: Spec-Driven Development Roadmap (`Specs 001–008`)
+# Architecture Context: Spec-Driven Development Roadmap (`Specs 001–008` — All Shipped)
 
 ## Full IPC Inventory (`public/_app/immutable/**/*.js`)
 - **Total `electronAPI.invoke` channels**: 414
 - **Total `domain:action` queries/commands**: 351
-- **Master Index**: `specs/README.md` (Committed in `ce0f5b8`)
+- **Unified Server Dispatch**: `POST /api/ipc` in `src/server/berry-http-server.js` + `dispatchServerIpc()` in `src/client/berry-electron-queries.js`
+- **Verification Suite**: `npm test` (`48/48` tests passing across `test/berry-browser.test.js` + `test/spec-002.test.js` .. `test/spec-008.test.js`)
 
-## Spec Packages
-1. **`specs/001-zero-placeholder-runtime/` (`SHIPPED` — `c557818`)**: Core runtime wiring across all 30 routes (Memory `CLAUDE.md`, Benchmarks, SyncedFS Storage, Sandbox status, Starter Kits, CRUD for Routines/Databases/Apps/Meetings).
-2. **`specs/002-agentic-chat-and-tool-loop/` (`READY`)**: 48 `chat:*`, `context:*`, `tokens:*` operations — multi-step tool loop, permission approvals, context attachments, conversation fork/truncate, FTS5 search, live token counting.
-3. **`specs/003-syncedfs-library-and-visual-artifacts/` (`READY`)**: 44 `synced-fs:*`, `syncedFs:*`, `fs:*`, `file:*`, `artifact-*`, `table:*`, `report:*` operations — bidirectional `~/.oi-browser/library/` watcher, spreadsheet cell editor, report editor, visual artifact sandbox.
-4. **`specs/004-companions-studio-and-skills-forge/` (`READY`)**: 32 `companions:*`, `skills:*`, `onboarding:*` operations — custom companion creator, filesystem `SKILL.md` sync & zip import/export.
-5. **`specs/005-autonomous-routines-and-cron-daemon/` (`READY`)**: 14 `routines:*` operations + `RoutineCronDaemon` background cron scheduler and pre-approval queue.
-6. **`specs/006-live-mcp-client-and-agent-databases/` (`READY`)**: 24 `integration:*`, `agent-db:*` operations — `McpClientBridge` for live stdio/SSE MCP servers and dedicated per-database SQLite engines (`~/.oi-browser/databases/<dbId>.sqlite`).
-7. **`specs/007-meetings-voice-and-activity-observer/` (`READY`)**: 38 `audio:*`, `meeting:*`, `transcription:*`, `voiceCommand:*`, `tts:*`, `quick-pill:*`, `gia-activity-memory:*` operations — local audio recording, Whisper/CLI transcription, CLI meeting summary, macOS `say` TTS, and `/timeline` observer.
-8. **`specs/008-browser-shell-vault-and-local-evals/` (`READY`)**: 52 `passwords:*`, `profile:*`, `history:*`, `bookmark:*`, `downloads:*`, `sandbox:reset`, `benchmark:*` operations — AES-256-GCM password vault, multi-profile browser switcher, history/bookmarks/downloads, and local eval runner.
+## Shipped Spec Domain Modules
+1. **`specs/001-zero-placeholder-runtime/` (`SHIPPED`)**: Core runtime wiring across all 30 routes (`src/server/sqlite-workspace-store.js`, `src/client/berry-electron-domains.js`).
+2. **`specs/002-agentic-chat-and-tool-loop/` (`SHIPPED` — `src/server/domains/spec-002-chat-loop.js`)**: 48 `chat:*`, `context:*`, `tokens:*` operations — multi-step turn abort/steer/retry/edit, tool permission rules, chunked file attachment staging, session fork/delete/compaction, system prompt preview, token estimator, and in-session text find.
+3. **`specs/003-syncedfs-library-and-visual-artifacts/` (`SHIPPED` — `src/server/domains/spec-003-syncedfs-artifacts.js`)**: 44 `synced-fs:*`, `syncedFs:*`, `fs:*`, `file:*`, `artifact-*`, `table:*`, `report:*` operations — `.versions/<sha256>` snapshots, `.trash/` soft-delete & recovery, BM25 FTS5 search, host file bridge, scoped `artifact_kv_store`, and RFC-4180 CSV/XLSX/PDF exports.
+4. **`specs/004-companions-studio-and-skills-forge/` (`SHIPPED` — `src/server/domains/spec-004-companions-skills.js`)**: 32 `companions:*`, `skills:*`, `onboarding:*` operations — companion CRUD + `COMPANION.md` sync + `companion_customizations`, and Skills Forge disk CRUD (`skills:create-folder`, `skills:get-folder`, `skills:update-folder`, `skills:delete-folder`).
+5. **`specs/005-autonomous-routines-and-cron-daemon/` (`SHIPPED` — `src/server/routine-cron-daemon.js` & `src/server/domains/spec-005-routines-cron.js`)**: 14 `routines:*` operations + `RoutineCronDaemon` 5-field cron & human schedule parser, `routine_runs` history, `routine_one_offs`, and `routines:listAvailableTriggers`.
+6. **`specs/006-live-mcp-client-and-agent-databases/` (`SHIPPED` — `src/server/mcp-client-bridge.js` & `src/server/domains/spec-006-mcp-databases.js`)**: 24 `integration:*`, `agent-db:*` operations — live Stdio & HTTP JSON-RPC 2.0 `McpClientBridge`, multi-database `.sqlite` provisioning with full DDL/DML support, and persistent `agent_db_grants` / `agent_db_companion_access`.
+7. **`specs/007-meetings-voice-and-activity-observer/` (`SHIPPED` — `src/server/domains/spec-007-meetings-voice.js`)**: 38 `audio:*`, `meeting:*`, `transcription:*`, `voiceCommand:*`, `tts:*`, `quick-pill:*`, `gia-activity-memory:*` operations — meeting search/deletion/post-meeting chat attachment, voice command & quick-pill dispatch, and SQLite `activity_events` search/schedule/deletion.
+8. **`specs/008-browser-shell-vault-and-local-evals/` (`SHIPPED` — `src/server/domains/spec-008-vault-shell-evals.js`)**: 52 `passwords:*`, `profile:*`, `history:*`, `bookmark:*`, `downloads:*`, `sandbox:reset`, `benchmark:*` operations — AES-256-GCM encrypted password vault + CSV import, multi-profile/history/bookmarks/downloads CRUD, sandbox reset, and interactive local benchmark & eval runner (`benchmark_runs` with transcripts and step logs).

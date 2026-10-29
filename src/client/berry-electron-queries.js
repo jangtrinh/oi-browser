@@ -26,6 +26,26 @@ function extractPromptText(messageInput) {
   return JSON.stringify(messageInput);
 }
 
+async function dispatchServerIpc(channel, payload, bridge) {
+  try {
+    const res = await fetch("/api/ipc", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ channel, payload })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.handled !== false) {
+        if (/(create|update|delete|write|restore|run|save|clear|reset|register|remove|approve|set|import|add|edit|duplicate|force|submit|confirm|finish|provision|share|revoke)/i.test(channel)) {
+          await bridge.fetchServerState();
+        }
+        return data;
+      }
+    }
+  } catch {}
+  return null;
+}
+
 export async function handleInvoke(eventName, payload = {}, bridge) {
   await bridge.readyPromise;
   const state = bridge.serverState;
@@ -45,7 +65,7 @@ export async function handleInvoke(eventName, payload = {}, bridge) {
   if (eventName === "account:get-or-create-invite-code") return { success: true, code: "BERRY-LOCAL", remainingInvites: 5 };
   if (eventName === "team:pending-invite" || eventName === "team:discover") return { success: true, invites: [], invite: null, teams: [] };
   if (eventName === "profile:get-all-profiles") {
-    return { profiles: [{ id: PROFILE_ID, name: "Ổi Workspace Local", email: "local@oibrowser.vn", isActive: true, isDefault: true }] };
+    return (await dispatchServerIpc(eventName, payload, bridge)) || { profiles: [{ id: PROFILE_ID, name: "Ổi Workspace Local", email: "local@oibrowser.vn", isActive: true, isDefault: true }] };
   }
   if (eventName === "sandbox:get-boot-status") {
     return {
@@ -71,7 +91,7 @@ export async function handleInvoke(eventName, payload = {}, bridge) {
     await bridge.fetchServerState();
     return { success: true, mode: payload.mode || "ask" };
   }
-  if (eventName === "chat-permissions:list-rules") return { rules: [] };
+  if (eventName === "chat-permissions:list-rules") return (await dispatchServerIpc(eventName, payload, bridge)) || { rules: [] };
   if (eventName === "search-engine:get") return { engine: state.settings?.searchEngine || "google", defaultEngine: state.settings?.searchEngine || "google" };
   if (eventName === "search-engine:set") {
     await fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: "searchEngine", value: payload.engine || "google" }) });
@@ -80,8 +100,8 @@ export async function handleInvoke(eventName, payload = {}, bridge) {
   }
   if (eventName === "browser:is-default") return { isDefault: true };
   if (eventName === "adblocker:get-enabled") return { enabled: state.settings?.adblockerEnabled !== false };
-  if (eventName === "extensions:get-all") return { extensions: [] };
-  if (eventName === "passwords:get-all") return { passwords: [] };
+  if (eventName === "extensions:get-all") return (await dispatchServerIpc(eventName, payload, bridge)) || { extensions: [] };
+  if (eventName === "passwords:get-all") return (await dispatchServerIpc(eventName, payload, bridge)) || { passwords: [] };
   if (eventName === "app:get-version") return { version: "1.0.0" };
   if (eventName === "storage:get-info") {
     const usage = state.storageUsage || { wikiBytes: 4096, dbBytes: 32768, wikiFilesCount: 10 };
@@ -131,7 +151,9 @@ export async function handleInvoke(eventName, payload = {}, bridge) {
     if (typeof window !== "undefined" && window.location.pathname.startsWith("/newtab")) setTimeout(() => { window.location.href = `/chat/${sess.id}`; }, 60);
     return { success: true, sessionId: sess.id, draftDisposition: "consumed", newTabPromoted: true, acceptedOperation: { operationId: `op-${Date.now()}`, kind: "message", createdAt: Date.now() } };
   }
-  if (eventName === "chat:get-agent-downloads" || eventName === "downloads:get-history" || eventName === "downloads:get-recent") return { downloads: [] };
+  if (eventName === "chat:get-agent-downloads" || eventName === "downloads:get-history" || eventName === "downloads:get-recent") {
+    return (await dispatchServerIpc(eventName, payload, bridge)) || { downloads: [] };
+  }
   if (eventName === "chat:cached-recent-sessions-paged" || eventName === "chat:recent-sessions-paged" || eventName === "chat:search-sessions-paged" || eventName === "chat:pinned-sessions") {
     return { sessions: Object.values(bridge.sessionsById), nextCursor: null, hasMore: false, hasExcludedDone: false };
   }
@@ -169,6 +191,8 @@ export async function handleInvoke(eventName, payload = {}, bridge) {
   }
   if (eventName === "audio:get-manager-state") return { status: "idle", activeRecordingId: null };
   if (eventName === "audio:get-permissions") return { microphone: "granted", screen: "granted" };
+  const ipcRes = await dispatchServerIpc(eventName, payload, bridge);
+  if (ipcRes !== null) return ipcRes;
   return { success: true };
 }
 
@@ -266,5 +290,7 @@ export async function handleQuery(query = {}, bridge) {
     if (targetPath.startsWith("/") && window.location.pathname + window.location.search !== targetPath) window.location.href = targetPath;
     return { success: true, tabId: "entry-1" };
   }
+  const ipcRes = await dispatchServerIpc(key, payload, bridge);
+  if (ipcRes !== null) return ipcRes;
   return { success: true, profileId: PROFILE_ID };
 }

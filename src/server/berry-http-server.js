@@ -9,6 +9,13 @@ import { CompanionChatOrchestrator } from "./companion-chat-orchestrator.js";
 import { CliHarnessRouter } from "./cli-harness-router.js";
 import { WikiFtsIndex } from "./wiki-fts-index.js";
 import { OFFICIAL_SKILLS } from "./official-companions-catalog.js";
+import { Spec002ChatLoopService } from "./domains/spec-002-chat-loop.js";
+import { Spec003SyncedFsArtifactsService } from "./domains/spec-003-syncedfs-artifacts.js";
+import { Spec004CompanionsSkillsService } from "./domains/spec-004-companions-skills.js";
+import { Spec005RoutinesCronService } from "./domains/spec-005-routines-cron.js";
+import { Spec006McpDatabasesService } from "./domains/spec-006-mcp-databases.js";
+import { Spec007MeetingsVoiceService } from "./domains/spec-007-meetings-voice.js";
+import { Spec008VaultShellEvalsService } from "./domains/spec-008-vault-shell-evals.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, "../..");
@@ -42,6 +49,15 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
   const domService = new AgentDOMBrowserService();
   const cliRouter = new CliHarnessRouter({ projectRoot: PROJECT_ROOT, wikiDir, skillsDir: path.join(PROJECT_ROOT, "skills") });
   const orchestrator = new CompanionChatOrchestrator({ store, memory, domService, cliRouter, wikiFts });
+  const spec002 = new Spec002ChatLoopService({ store, memory, wikiFts, domService, cliRouter, orchestrator, dataDir });
+  const spec003 = new Spec003SyncedFsArtifactsService({ store, memory, wikiFts, dataDir });
+  const spec004 = new Spec004CompanionsSkillsService({ store, memory, wikiFts, skillCatalog: cliRouter.skillCatalog, skillsDir: path.join(dataDir, "skills") });
+  const spec005 = new Spec005RoutinesCronService({ store, orchestrator });
+  const spec006 = new Spec006McpDatabasesService({ store, dataDir });
+  const spec007 = new Spec007MeetingsVoiceService({ store, memory, orchestrator });
+  const spec008 = new Spec008VaultShellEvalsService({ store, cliRouter, dataDir });
+  const domainServices = [spec002, spec003, spec004, spec005, spec006, spec007, spec008];
+  spec005.daemon?.start?.(60000);
   const publicDir = path.join(PROJECT_ROOT, "public");
   const clientDir = path.join(PROJECT_ROOT, "src/client");
 
@@ -64,6 +80,14 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
     try {
       const { pathname, searchParams } = new URL(req.url, "http://127.0.0.1:4104");
 
+      if (pathname === "/api/ipc" && req.method === "POST") {
+        const { channel, payload = {} } = await readJsonBody(req);
+        for (const svc of domainServices) {
+          const out = await svc.handleChannel(channel, payload);
+          if (out !== null && out !== undefined) return sendJson(res, 200, out);
+        }
+        return sendJson(res, 200, { handled: false, success: true });
+      }
       if (pathname === "/api/state" && req.method === "GET") {
         return sendJson(res, 200, {
           tabs: store.listTabs(), companions: store.listCompanions(), routines: store.listRoutines(),
@@ -231,7 +255,7 @@ export function createBerryServer({ dataDir = path.join(PROJECT_ROOT, ".berry-da
     }
   });
 
-  return { server, store, memory, wikiFts, domService, cliRouter, orchestrator };
+  return { server, store, memory, wikiFts, domService, cliRouter, orchestrator, domains: { spec002, spec003, spec004, spec005, spec006, spec007, spec008 } };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -233,4 +233,50 @@ test("Ổi Browser full-stack verification suite", async (t) => {
     const toggleRoutineData = await toggleRoutineRes.json();
     assert.equal(toggleRoutineData.routine.enabled, 0);
   });
+
+  await t.test("Specs 002–008 Unified /api/ipc Dispatch across all 7 Domain Services", async () => {
+    const callIpc = async (channel, payload = {}) => {
+      const res = await fetch(`${baseUrl}/api/ipc`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channel, payload })
+      });
+      assert.equal(res.status, 200);
+      return res.json();
+    };
+
+    // Spec 002: System prompt preview & token estimation
+    const s2 = await callIpc("chat:previewSystemPrompt", { companionId: "research-rosa" });
+    assert.equal(s2.success, true);
+    assert.ok(s2.tokenEstimate > 10);
+
+    // Spec 003: SyncedFS write + version history
+    await callIpc("synced-fs:write", { path: "PROFILE.md", content: "# Updated Profile v2\n" });
+    const s3 = await callIpc("synced-fs:list-versions", { path: "PROFILE.md" });
+    assert.equal(s3.success, true);
+    assert.ok(s3.versions.length >= 1);
+
+    // Spec 004: Skills Forge create-folder
+    const s4 = await callIpc("skills:create-folder", { name: "oi-e2e-skill", description: "E2E Skill", instructions: "# E2E Skill\nRun check." });
+    assert.equal(s4.success, true);
+    assert.equal(s4.folder.name, "oi-e2e-skill");
+
+    // Spec 005: Routines available triggers
+    const s5 = await callIpc("routines:listAvailableTriggers", {});
+    assert.equal(s5.success, true);
+    assert.ok(s5.triggers.length >= 3);
+
+    // Spec 006: Multi-database provisioning
+    const s6 = await callIpc("agent-db:provision-database", { dbHandle: "crm-e2e-db", name: "CRM E2E DB" });
+    assert.equal(s6.ok, true);
+
+    // Spec 007: Activity memory search
+    const s7 = await callIpc("gia-activity-memory:search", { query: "Ổi" });
+    assert.equal(s7.success, true);
+
+    // Spec 008: Encrypted password vault add & get-all
+    await callIpc("passwords:add", { domain: "github.com", username: "jangtrinh", password: "secret-password-123" });
+    const s8 = await callIpc("passwords:get-all", {});
+    assert.ok(s8.passwords.some((p) => p.domain === "github.com" && p.username === "jangtrinh"));
+  });
 });

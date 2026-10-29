@@ -14,7 +14,7 @@
     "dev": "node --experimental-sqlite src/server/berry-http-server.js --port 4104",
     "start": "node --experimental-sqlite src/server/berry-http-server.js --port 4104",
     "build:macos": "bash scripts/build-macos-app.sh",
-    "test": "node --experimental-sqlite --test test/berry-browser.test.js"
+    "test": "node --experimental-sqlite --test test/*.test.js"
   },
   "engines": {
     "node": ">=22.5.0"
