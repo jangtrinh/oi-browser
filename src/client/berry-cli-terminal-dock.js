@@ -27,9 +27,7 @@ function injectDockStyles() {
   const style = document.createElement("style");
   style.id = "oi-cli-dock-styles";
   style.textContent = `
-    .oi-sidebar-cli-link { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 32px; padding: 0 8px; margin-top: 2px; border-radius: 8px; font-family: inherit; font-size: 13.5px; color: oklch(var(--foreground) / 0.8); text-decoration: none; cursor: pointer; transition: background 0.12s ease, color 0.12s ease; }
-    .oi-sidebar-cli-link:hover { background: var(--theme-surface-hover, rgba(0,0,0,0.04)); color: oklch(var(--foreground)); }
-    .oi-sidebar-cli-left { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+    .oi-sidebar-cli-link { text-decoration: none; cursor: pointer; }
     [data-testid="ai-provider-settings"] > div:not(#oi-cli-settings-host):not(:first-child) { display: none !important; }
     .oi-opt-group { margin-top: 24px; }
     .oi-opt-group + .oi-opt-group { margin-top: 40px; }
@@ -114,22 +112,38 @@ function buildSettingsPanelHtml() {
   </div>`;
 }
 
+const NATIVE_CLI_ICON_SVG = `<svg viewBox="0 0 24 24" width="1.2em" height="1.2em" class="size-4 shrink-0 [&_*]:[stroke-width:1.75]"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m8 9l3 3l-3 3m5 0h3"></path><path d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></g></svg>`;
+
 export function renderCliDock(force = false) {
   if (typeof document === "undefined") return;
   injectDockStyles();
 
   const libBtn = Array.from(document.querySelectorAll(".home-sidebar-layout button, .home-sidebar-layout a")).find((el) => el.textContent?.trim() === "Library");
-  const libRow = libBtn?.closest("li, div") || libBtn;
-  if (libRow && libRow.parentElement) {
+  if (libBtn && libBtn.parentElement) {
+    const outerSpanClass = libBtn.children[0]?.className || "flex size-9 shrink-0 items-center justify-center";
+    const innerSpanClass = libBtn.children[0]?.firstElementChild?.className || "flex size-9 items-center justify-center";
+    const labelSpanClass = libBtn.children[1]?.className || "-ml-0.5 min-w-0 flex-1 truncate pr-3 text-left";
     let navItem = document.getElementById("oi-sidebar-cli-settings-link");
-    if (!navItem || force) {
+    if (!navItem || force || navItem.parentElement !== libBtn.parentElement) {
       if (!navItem) {
-        navItem = Object.assign(document.createElement("a"), { id: "oi-sidebar-cli-settings-link", className: "oi-sidebar-cli-link", href: "/settings/ai-provider" });
+        navItem = Object.assign(document.createElement("a"), { id: "oi-sidebar-cli-settings-link", href: "/settings/ai-provider" });
         navItem.setAttribute("data-testid", "oi-cli-toggle");
-        libRow.insertAdjacentElement("afterend", navItem);
+        navItem.setAttribute("aria-label", "CLI Core");
       }
-      navItem.innerHTML = `<span class="oi-sidebar-cli-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg><span>CLI Core</span></span>`;
+      navItem.className = `${libBtn.className} oi-sidebar-cli-link`;
+      const inlineStyle = libBtn.getAttribute("style");
+      if (inlineStyle) navItem.setAttribute("style", inlineStyle);
+      if (navItem.previousElementSibling !== libBtn) {
+        libBtn.insertAdjacentElement("afterend", navItem);
+      }
+      navItem.innerHTML = `<span class="${outerSpanClass}"><span class="${innerSpanClass}">${NATIVE_CLI_ICON_SVG}</span></span> <span aria-hidden="false" class="${labelSpanClass}">CLI Core</span>`;
     }
+  }
+
+  const settingsAiLink = document.querySelector('a[href="/settings/ai-provider"]');
+  const settingsAiSvg = settingsAiLink?.querySelector('svg[viewBox="0 0 256 260"]');
+  if (settingsAiSvg) {
+    settingsAiSvg.outerHTML = NATIVE_CLI_ICON_SVG;
   }
 
   const aiProviderHost = document.querySelector('[data-testid="ai-provider-settings"]');
